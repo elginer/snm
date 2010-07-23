@@ -1,4 +1,4 @@
-Name:		The Simple Nice Manual Generator
+Name:           snm 
 Version:	0.0.1
 Cabal-Version:  >= 1.2
 License:	GPL-3
@@ -9,7 +9,11 @@ Synopsis:       Generate nice looking xhtml manuals from source files.
 Build-type:	Simple
 
 Library
-   Build-Depends: base>=4, filepath, directory, containers, hssyck
+   Build-Depends: base>=4, parsec>=3, filepath, directory, containers, HsSyck, SpoonsUtilities
    Exposed-modules:
       Data.Yaml.Simple
-      Doc.Structure
+      Manual.Structure
+      Manual.Reader
+
+Executable parse
+   Main-is: tests/parse.hs
