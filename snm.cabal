@@ -1,0 +1,15 @@
+Name:		The Simple Nice Manual Generator
+Version:	0.0.1
+Cabal-Version:  >= 1.2
+License:	GPL-3
+License-File:   COPYING	
+Author:		John Morrice
+Category:	Documentation
+Synopsis:       Generate nice looking xhtml manuals from source files. 
+Build-type:	Simple
+
+Library
+   Build-Depends: base>=4, filepath, directory, containers, hssyck
+   Exposed-modules:
+      Data.Yaml.Simple
+      Doc.Structure
