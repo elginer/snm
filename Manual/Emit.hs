@@ -25,85 +25,16 @@ This file is part of The Simple Nice Manual Generator.
 -- | Emit manuals
 module Manual.Emit where
 
+import Manual.Emit.XHTML
+import Manual.Emit.Text
 import Manual.Structure
 
 import Text.Pretty
-
-import Data.List
-
--- | Contents listing
-data Contents = 
-   Contents [Contents]
-   | Entry [Int] String
-   deriving Show
-
-instance Pretty Contents where
-   pretty' c sp =
-      case c of
-         Entry nums name -> pspace sp . pretty_nums nums . ((' ' : name) ++)
-         Contents cs -> pretty_list' cs $ sp + 1
 
 -- | Emit a manual as text
 emit_text :: Manual -> String
 emit_text = pretty
 
--- Pretty print manuals
-instance Pretty Manual where
-   pretty' man _ =
-      pretty' (header man) 0 . nl . 
-         pretty' (contents man) (-1) . nl . nl .
-            pretty_list' (sort_sections $ sections man) 0
-
-      where
-      sort_sections = sortBy (\s1 s2 -> number s1 `compare` number s2)
-
-contents :: Manual -> Contents
-contents =
-   Contents . gather_sections . sections
-
-gather_sections :: [Section] -> [Contents]
-gather_sections ss = 
-   concatMap subsection_contents $ 
-      sortBy (\s1 s2 -> number s1 `compare` number s2) ss
-
-subsection_contents :: Section -> [Contents]
-subsection_contents s =
-   if null $ subsections s
-      then [me]
-      else [me , Contents $ gather_sections (subsections s)]
-   where
-   me = Entry (number s) (title s)
-
-
-instance Pretty Section where
-   pretty' sec _ =
-      pretty_nums (number sec) . (' ' :) . mock_shows (title sec) . nl . nl . 
-         pretty_list_nl' (stext sec) 0 . nl . nl .
-            (if null $ subsections sec
-               then id
-               else pretty_list' (subsections sec) 0 . nl)
-
-mock_shows :: String -> ShowS
-mock_shows s = (s ++) 
-
-pretty_nums :: [Int] -> ShowS
-pretty_nums nums = (intercalate "." (map show nums) ++)
-
-instance Pretty Paragraph where
-   pretty' par _ =
-      pretty_list' (ptext par) 0
-
-instance Pretty Header where
-   pretty' head _ =
-      mock_shows (mtitle head) . nl . nl .
-         mock_shows ("Copyright " ++ copyright head) . nl .
-            mock_shows ("Distributed under terms of the " ++ license head ++ ".") . nl .
-               mock_shows ("See the file " ++ license_file head ++ " for details.") . nl . nl .
-                  pretty_list_nl' (preamble head) 0
-
-instance Pretty Inline where
-   pretty' inline _ =
-      case inline of
-         IText str -> mock_shows str
-         ISectionLink text dest -> mock_shows text . mock_shows " (see section '" . mock_shows dest . mock_shows "')"
-         IExternLink text dest -> mock_shows text . mock_shows " (see '" . mock_shows dest . mock_shows "')"
+-- | Emit a manual as rendered xhtml
+emit_xhtml :: Manual -> String
+emit_xhtml = render_manual_xhtml 
