@@ -66,6 +66,12 @@ data Inline =
      , -- | The link destination.
        ldest :: String
      }
+   | -- | Literal text
+     ILiteral String
+   | -- | A three space indent
+     IIndent
+   | -- | A new line
+     ILine
    deriving Show
 
 -- | A text paragraph

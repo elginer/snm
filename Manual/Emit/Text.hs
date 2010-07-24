@@ -89,3 +89,6 @@ instance Pretty Inline where
          IText str -> mock_shows str
          ISectionLink text dest -> mock_shows text
          IExternLink text dest -> mock_shows text . mock_shows "(see " . mock_shows dest . mock_shows ")"
+         IIndent -> mock_shows "   "
+         ILine -> nl
+         ILiteral t -> mock_shows t

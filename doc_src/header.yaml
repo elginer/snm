@@ -2,3 +2,6 @@ title: The Simple Nice-Looking Manual Generator
 copyright: "John Morrice 2010"
 license: GNU Free Documentation License
 license_file: "DOC-COPYING"
+preamble:
+   - "The Simple Nice-Looking Manual Generator - aka snm - generates nice looking manuals from {external YAML http://www.yaml.org/} files."
+   - "Currently, it can produce XHTML and text manuals."

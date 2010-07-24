@@ -103,6 +103,9 @@ instance HTML Inline where
          IText str -> stringToHtml $ str ++ " "
          ISectionLink text dest -> section_link text dest
          IExternLink text dest  -> extern_link text dest
+         IIndent -> concatHtml $ replicate 3 nbsp
+         ILine -> br
+         ILiteral t -> primHtml t
 
 -- | Internal link to elsewhere in the document
 section_link :: String -> URL -> Html

@@ -51,8 +51,30 @@ import Control.Monad
 -- | Parse an inline element
 inline :: Parser Inline
 inline =
-   try text <|> try section_link <|> extern_link
+   try text <|> try section_link <|> try extern_link <|> try iindent <|> try iliteral <|> iline
    where
+   iliteral = do
+      char '{'
+      spaces
+      string "literal"
+      spaces
+      text <- many1 $ noneOf "\n\t\r}"
+      spaces
+      char '}'
+      return $ ILiteral text
+
+   iindent = simple "indent" IIndent
+
+   iline = simple "line" ILine
+
+   simple id val = do
+      char '{'
+      spaces
+      string id
+      spaces
+      char '}'
+      return val
+
    text :: Parser Inline
    text = fmap (IText . concat) $ many1 itext
    itext :: Parser String
@@ -205,7 +227,7 @@ instance Yamlable Header where
       copyright = read_key (herror "copyright") $ yookup "copyright" y
       license = read_key (herror "license") $ yookup "license" y
       license_file = read_key (herror "license_file") $ yookup "license_file" y
-      preamble = fromMaybe (herror "preamble") $ paras $ yookup "preamble" y
+      preamble = fromMaybe [] $ paras $ yookup "preamble" y
       herror nm = error $ pretty $ 
          error_line "Error while reading Header:" $
             error_section $ error_line ("Header did not have valid '" ++ nm ++ "' field.") $ error_section $ 

@@ -1,0 +1,6 @@
+title: How to use snm
+unique: how
+number: 3
+text:
+   - "snm generates a manual from a number of yaml files, held in your documentation source directory.  In the snm source distribution, this directory is called 'doc_src'."
+   - "This source directory must contain a file called 'header.yaml'.  The next sub-section deals with what you put in header.yaml, and what it means."
