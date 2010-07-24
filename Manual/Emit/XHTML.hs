@@ -53,7 +53,10 @@ instance HTML Header where
       [htitle $ mtitle head
       , hinfo $ copy_notice $ copyright head
       , hinfo $ license_notice $ license head
-      , hinfo $ license_file_notice $ license_file head] ++ map toHtml (preamble head)
+      , h2 $ concatHtml
+         [stringToHtml "See the file " 
+         ,(anchor (stringToHtml $ license_file head) ! [href $ license_file head])
+         ,stringToHtml "for copying conditions."]] ++ map toHtml (preamble head)
 
 -- The contents
 instance HTML Contents where
