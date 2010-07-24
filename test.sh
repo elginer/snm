@@ -1,2 +1,3 @@
 #! /bin/sh
-./dist/build/$1/$1
+
+runghc tests/$1

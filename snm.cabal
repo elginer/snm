@@ -9,11 +9,20 @@ Synopsis:       Generate nice looking xhtml manuals from source files.
 Build-type:	Simple
 
 Library
-   Build-Depends: base>=4, parsec>=3, filepath, directory, containers, HsSyck, SpoonsUtilities
+   Build-Depends: base>=4, parsec>=3, filepath, directory, containers, HsSyck, SpoonsUtilities, safe
    Exposed-modules:
       Data.Yaml.Simple
       Manual.Structure
       Manual.Reader
+      Manual.Emit
+      Manual
 
-Executable parse
-   Main-is: tests/parse.hs
+Executable snm
+   Main-is: bin/snm.hs
+   Build-Depends: base>=4, parsec>=3, filepath, directory, containers, HsSyck, SpoonsUtilities, safe
+   Other-modules:
+      Data.Yaml.Simple
+      Manual.Structure
+      Manual.Reader
+      Manual.Emit
+      Manual

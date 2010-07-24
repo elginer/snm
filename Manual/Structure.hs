@@ -34,10 +34,17 @@ type CSS = String
 -- | A manual's header file
 data Header = Header 
    { -- | The name of the manual
-     mname :: String
-   , -- | Preambles, not linked in the manual's contents.
-     preambles :: [Paragraph] 
+     mtitle :: String
+   , -- | Copyright notice
+     copyright :: String
+   , -- | License
+     license :: String
+   , -- | License File
+     license_file :: String
+   , -- | Preamble, not linked in the manual's contents.
+     preamble :: [Paragraph] 
    }
+   deriving Show
 
 -- | Inline document elements may be...
 data Inline =
@@ -47,8 +54,8 @@ data Inline =
      ISectionLink
      { -- | The link text.
        ltext :: String
-     , -- | The unique section name
-       ldest :: String
+     , -- | The section number
+       ldest :: String 
      }
    | -- | An external link.
      IExternLink
@@ -66,6 +73,7 @@ data Paragraph = Paragraph
    , -- | The paragraph's class
      pclass :: String
    } 
+   deriving Show
 
 -- | A manual
 data Manual = Manual
@@ -74,17 +82,19 @@ data Manual = Manual
    , -- | The style used in the manual.
      style  :: CSS
    , -- | The sections of a manual.
-     sections :: Section
+     sections :: [Section]
    }
+   deriving Show
 
 -- | Sections, subsections
 data Section = Section
    { -- | The section's number.
-     number :: Int
+     number :: [Int]
    , -- | The title of the section
     title :: String
-   , -- | A unique name for this section
-     unique :: String
    , -- | The section text
     stext :: [Paragraph]
+     -- | Subsections
+   , subsections :: [Section]
    }
+   deriving Show

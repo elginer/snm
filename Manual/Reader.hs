@@ -34,6 +34,19 @@ import Text.Parsec.String
 
 import Data.Either
 
+import Data.Maybe
+
+import Error.Report
+
+import Safe
+
+import System.FilePath
+import System.Directory
+
+import qualified Data.Set as S
+
+import Control.Monad
+
 -- | Parse an inline element
 inline :: Parser Inline
 inline =
@@ -61,12 +74,19 @@ inline =
       return $ f txt uniq
 
 -- | Parse inline elements
+eparse_inline :: String -> Either ParseError [Inline]
+eparse_inline txt =
+   if null txt
+      then Right [IText ""]
+      else 
+         parse (many1 inline) "" txt
+
+-- | Parse inline elements
 parse_inline :: String -> [Inline]
 parse_inline txt =
-   if null txt
-      then [IText ""]
-      else 
-         either (error . show) id $ parse (many1 inline) "" txt
+   either (error . show) id $ eparse_inline txt 
+
+-- I say the orphan instances are okay because this is a module EXCLUSIVELY for reading in the manual
 
 -- Convert a yaml description of a paragraph into a paragraph.
 instance Yamlable Paragraph where
@@ -76,12 +96,130 @@ instance Yamlable Paragraph where
             Paragraph (parse_inline s) ""
          YMap m ->
             Paragraph (parse_inline $ ptext "text") (ptext "class")
-         _      -> perror "Paragraph cannot be a series."
+         _      -> perror "Paragraph must be a string or a map"
       where
       -- Look up paragraph text from a map
       ptext :: String -> String
       ptext nm =
-         case yookup nm y of
-            Just (YStr s) -> s
-            _      -> perror $ "Could not find text field '" ++ nm ++ "' in paragraph map.  Must have members 'txt' and 'class'"
-      perror msg = error $ "Error while reading paragraph: " ++ msg
+         yext (yookup nm y) (error $ "Could not find text field '" ++ nm ++ "' in paragraph map.  Must have members 'text' and 'class'")
+
+      perror msg = error $ pretty $
+         error_line "Error while reading Paragraph: " $
+            error_section $ error_line msg $ error_section $ 
+               error_lines ["Reading yaml:", show y] $ empty_error
+
+-- | Read a string from maybe a yaml
+yext :: Maybe Yaml -> String -> String
+yext y str = fromMaybe str $ y >>= ystr
+
+ystr :: Yaml -> Maybe String
+ystr y =
+   case y of
+      YStr s -> Just s
+      _      -> Nothing
+
+ymap :: (Yaml -> a) -> Yaml -> Maybe [a]
+ymap f y =
+   case y of
+      YSeq ys -> Just $ map f ys
+      _       -> Nothing
+
+instance Yamlable Section where
+   from_yaml y =
+      Section [snumber $ yookup "number" y]
+              (stitle $ yookup "title" y)
+              (fromMaybe (serror "text") $ paras $ yookup "text" y)
+              []
+      where
+      snumber a = 
+         fromMaybe (serror "number")  $ a >>= ystr >>= readMay 
+
+      stitle a =
+         read_key (serror "title") $ yookup "title" y
+
+      serror msg = error $ pretty $ 
+         error_line "Error while reading Section:" $ error_section $
+            error_line ("Section did not have a valid '" ++ msg ++ "' member.") $ error_section $
+               error_lines ["Reading yaml:", show y] empty_error
+
+read_key :: String -> Maybe Yaml -> String 
+read_key err ma = not_empty err $ yext ma err
+
+not_empty :: String -> String -> String
+not_empty nm str =
+   if null str
+      then nm
+      else str
+
+-- | Load a section and all associated subsections.
+load_section :: FilePath -> IO Section
+load_section = flip load_section_nums []
+
+
+-- | Load a section and all associated subsections.
+load_section_nums :: FilePath
+             -> [Int]
+             -> IO Section
+load_section_nums fp nums = do
+   root <- parse_yaml_file fp
+   let new_nums = number un_root_section ++ nums
+       un_root_section = from_yaml root
+       root_section = un_root_section {number = reverse new_nums}
+       subsection_dir = combine dir (title root_section)
+   subsections_exist <- doesDirectoryExist subsection_dir
+   if subsections_exist
+      then do
+         subsect_fs <- getDirectoryFiles subsection_dir
+         subsects <- mapM (flip load_section_nums new_nums) subsect_fs
+         return $ root_section {subsections = subsects}
+      else
+         return root_section
+   where
+   dir = dropFileName fp
+
+paras :: Maybe Yaml -> Maybe [Paragraph]
+paras ma =
+   ma >>= next
+   where
+   next y =
+      case y of
+         YStr t -> Just [from_yaml y]
+         y -> ymap from_yaml y
+
+-- Load a header file
+instance Yamlable Header where
+   from_yaml y =
+      Header title
+             copyright
+             license
+             license_file
+             preamble
+      where
+      title = read_key (herror "title") $ yookup "title" y
+      copyright = read_key (herror "copyright") $ yookup "copyright" y
+      license = read_key (herror "license") $ yookup "license" y
+      license_file = read_key (herror "license_file") $ yookup "license_file" y
+      preamble = fromMaybe (herror "preamble") $ paras $ yookup "preamble" y
+      herror nm = error $ pretty $ 
+         error_line "Error while reading Header:" $
+            error_section $ error_line ("Header did not have valid '" ++ nm ++ "' field.") $ error_section $ 
+               error_lines ["Reading yaml:", show y] empty_error
+
+-- | Get the qualified names of files in a directory
+getDirectoryFiles :: FilePath -> IO [FilePath]
+getDirectoryFiles dir = do
+   fs <- fmap (map (combine dir) . filter (\f -> head f /= '.')) $ getDirectoryContents dir
+   filterM doesFileExist fs
+
+-- | Load a manual from a directory
+load_manual :: FilePath -> IO Manual
+load_manual man_dir = do
+   fs <- getDirectoryFiles man_dir
+   let sfs = S.fromList fs
+       headf = combine man_dir "header.yaml"
+   if S.member headf sfs
+      then do
+         head <- fmap (from_yaml) $ parse_yaml_file headf
+         sections <- mapM load_section $ S.toList $ S.delete headf sfs
+         return $ Manual head "" sections 
+      else error $ "load_manual: Header not present"

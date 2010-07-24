@@ -52,12 +52,12 @@ simplify yaml =
       ENil   -> YNil
 
 -- | Parse yaml
-parseYaml :: String -> IO Yaml
-parseYaml = fmap simplify . S.parseYaml
+parse_yaml :: String -> IO Yaml
+parse_yaml = fmap simplify . S.parseYaml
 
 -- | Parse yaml file
-parseYamlFile :: FilePath -> IO Yaml
-parseYamlFile = fmap simplify . S.parseYamlFile
+parse_yaml_file :: FilePath -> IO Yaml
+parse_yaml_file = fmap simplify . S.parseYamlFile
 
 -- | Look up a yaml element referenced by a string in a yaml map
 yookup :: String -> Yaml -> Maybe Yaml

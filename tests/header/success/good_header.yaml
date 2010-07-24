@@ -1,0 +1,7 @@
+title: Cool manual
+copyright: Johnny Mo
+license: GNU-FDL
+license_file: DOC-COPYING
+preamble:
+   - This is a long preamble.
+   - Full of waffle.
