@@ -33,8 +33,8 @@ import Text.Parsec
 import Text.Parsec.String
 
 import Data.Either
-
 import Data.Maybe
+import Data.List
 
 import Error.Report
 
@@ -46,6 +46,7 @@ import System.Directory
 import qualified Data.Set as S
 
 import Control.Monad
+
 
 -- | Parse an inline element
 inline :: Parser Inline
@@ -128,14 +129,15 @@ instance Yamlable Section where
    from_yaml y =
       Section [snumber $ yookup "number" y]
               (stitle $ yookup "title" y)
+              (read_key (serror "unique") $ yookup "unique" y)
               (fromMaybe (serror "text") $ paras $ yookup "text" y)
               []
       where
       snumber a = 
          fromMaybe (serror "number")  $ a >>= ystr >>= readMay 
 
-      stitle a =
-         read_key (serror "title") $ yookup "title" y
+      stitle =
+         read_key (serror "title")
 
       serror msg = error $ pretty $ 
          error_line "Error while reading Section:" $ error_section $
@@ -165,17 +167,21 @@ load_section_nums fp nums = do
    let new_nums = number un_root_section ++ nums
        un_root_section = from_yaml root
        root_section = un_root_section {number = reverse new_nums}
-       subsection_dir = combine dir (title root_section)
+       subsection_dir = dropExtensions fp
    subsections_exist <- doesDirectoryExist subsection_dir
    if subsections_exist
       then do
          subsect_fs <- getDirectoryFiles subsection_dir
          subsects <- mapM (flip load_section_nums new_nums) subsect_fs
-         return $ root_section {subsections = subsects}
+         return $ root_section {subsections = sort_sections subsects}
       else
          return root_section
    where
    dir = dropFileName fp
+
+sort_sections :: [Section] -> [Section]
+sort_sections = 
+   sortBy (\s1 s2 -> number s1 `compare` number s2)
 
 paras :: Maybe Yaml -> Maybe [Paragraph]
 paras ma =
@@ -215,11 +221,15 @@ getDirectoryFiles dir = do
 load_manual :: FilePath -> IO Manual
 load_manual man_dir = do
    fs <- getDirectoryFiles man_dir
-   let sfs = S.fromList fs
+   let files = S.fromList fs
+       sfs = S.delete headf $ S.delete css_file $ files 
        headf = combine man_dir "header.yaml"
-   if S.member headf sfs
+   css <- if S.member css_file files then readFile css_file else return ""
+   if S.member headf files
       then do
          head <- fmap (from_yaml) $ parse_yaml_file headf
-         sections <- mapM load_section $ S.toList $ S.delete headf sfs
-         return $ Manual head "" sections 
+         sections <- fmap sort_sections $ mapM load_section $ S.toList sfs
+         return $ Manual head css (contents sections) sections
       else error $ "load_manual: Header not present"
+   where
+   css_file = man_dir `combine` "style" `addExtension` "css"

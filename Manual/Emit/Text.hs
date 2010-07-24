@@ -31,45 +31,18 @@ import Text.Pretty
 
 import Data.List
 
--- | Contents listing
-data Contents = 
-   Contents [Contents]
-   | Entry [Int] String
-   deriving Show
-
 instance Pretty Contents where
    pretty' c sp =
       case c of
-         Entry nums name -> pspace sp . pretty_nums nums . ((' ' : name) ++)
+         Entry nums name _ -> pspace sp . pretty_nums nums . ((' ' : name) ++)
          Contents cs -> pretty_list' cs $ sp + 1
 
 -- Pretty print manuals
 instance Pretty Manual where
    pretty' man _ =
       pretty' (header man) 0 . nl . 
-         pretty' (contents man) (-1) . nl . nl .
-            pretty_list' (sort_sections $ sections man) 0
-
-      where
-      sort_sections = sortBy (\s1 s2 -> number s1 `compare` number s2)
-
-contents :: Manual -> Contents
-contents =
-   Contents . gather_sections . sections
-
-gather_sections :: [Section] -> [Contents]
-gather_sections ss = 
-   concatMap subsection_contents $ 
-      sortBy (\s1 s2 -> number s1 `compare` number s2) ss
-
-subsection_contents :: Section -> [Contents]
-subsection_contents s =
-   if null $ subsections s
-      then [me]
-      else [me , Contents $ gather_sections (subsections s)]
-   where
-   me = Entry (number s) (title s)
-
+         pretty' (mcontents man) (-1) . nl . nl .
+            pretty_list' (sections man) 0
 
 instance Pretty Section where
    pretty' sec _ =
@@ -114,5 +87,5 @@ instance Pretty Inline where
    pretty' inline _ =
       case inline of
          IText str -> mock_shows str
-         ISectionLink text dest -> mock_shows text . mock_shows " (see section '" . mock_shows dest . mock_shows "')"
-         IExternLink text dest -> mock_shows text . mock_shows " (see '" . mock_shows dest . mock_shows "')"
+         ISectionLink text dest -> mock_shows text
+         IExternLink text dest -> mock_shows text . mock_shows "(see " . mock_shows dest . mock_shows ")"

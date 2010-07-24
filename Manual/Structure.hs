@@ -28,6 +28,8 @@ module Manual.Structure where
 import System.FilePath
 import System.Directory
 
+import Data.List
+
 -- | We just see a CSS file as a string
 type CSS = String
 
@@ -81,6 +83,8 @@ data Manual = Manual
      header :: Header
    , -- | The style used in the manual.
      style  :: CSS
+   , -- | The manual's contents.
+     mcontents :: Contents
    , -- | The sections of a manual.
      sections :: [Section]
    }
@@ -92,9 +96,35 @@ data Section = Section
      number :: [Int]
    , -- | The title of the section
     title :: String
+   , -- | Unique name for this section
+    unique :: String
    , -- | The section text
     stext :: [Paragraph]
      -- | Subsections
    , subsections :: [Section]
    }
    deriving Show
+
+-- | Contents listing
+data Contents = 
+   Contents [Contents]
+   | Entry [Int] String String
+   deriving Show
+
+contents :: [Section] -> Contents
+contents =
+   Contents . gather_sections
+
+gather_sections :: [Section] -> [Contents]
+gather_sections ss = 
+   concatMap subsection_contents $ 
+      sortBy (\s1 s2 -> number s1 `compare` number s2) ss
+
+subsection_contents :: Section -> [Contents]
+subsection_contents s =
+   if null $ subsections s
+      then [me]
+      else [me , Contents $ gather_sections (subsections s)]
+   where
+   me = Entry (number s) (title s) (unique s)
+

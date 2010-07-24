@@ -29,7 +29,10 @@ import Manual.Emit.Text
 
 import Text.Pretty
 
-import Text.XHtml.Strict hiding (copyright,header,title)
+import Text.XHtml.Strict hiding (copyright,header,title,style)
+import qualified Text.XHtml.Strict as X
+
+import Data.Char
 
 -- | Render the manual as XHTML and show as a string
 render_manual_xhtml :: Manual -> String
@@ -38,15 +41,34 @@ render_manual_xhtml = showHtml . toHtml
 -- The manual can be converted to html
 instance HTML Manual where
    toHtml man =
-      thehtml $ body $ concatHtml $ toHtml (header man) : map toHtml (sections man)
+      X.header (concatHtml [meta ! [httpequiv "Content-Type"
+                                   ,content "text/html;charset=utf-8"]
+                           , thetitle $ stringToHtml $ mtitle $ header man
+                           , X.style (primHtml $ style man) ! [thetype "text/css"]]) +++ 
+         (body $ concatHtml $ toHtml (header man) : toHtml (mcontents man) : map toHtml (sections man))
 
 -- The header can be converted to html
 instance HTML Header where
-   toHtml head = concatHtml $ map toHtml
+   toHtml head = concatHtml $ map ((! [theclass "banner"]) . toHtml)
       [htitle $ mtitle head
       , hinfo $ copy_notice $ copyright head
       , hinfo $ license_notice $ license head
       , hinfo $ license_file_notice $ license_file head] ++ map toHtml (preamble head)
+
+-- The contents
+instance HTML Contents where
+   toHtml = paragraph . hcontents (-1)
+
+nbsp :: Html
+nbsp = spaceHtml
+
+hcontents :: Int -> Contents -> Html
+hcontents i c =
+   case c of
+      Contents cs -> concatHtml $ map (hcontents $ i + 1) cs
+      Entry nums str unique ->
+         let sname = section_name nums str
+         in  concatHtml $ replicate (3 * i) nbsp ++ [section_link sname unique, br]
 
 htitle :: String -> Html
 htitle = h1 . stringToHtml
@@ -54,23 +76,23 @@ htitle = h1 . stringToHtml
 hinfo :: String -> Html
 hinfo = h2 . stringToHtml
 
-section_title :: [Int] -> String -> Html
-section_title nums section = 
-   h2 $ (anchor $ stringToHtml sname) ! [name sname]
+section_title :: [Int] -> String -> String -> Html
+section_title nums section unique = 
+   h2 $ (anchor $ stringToHtml sname) ! [name unique]
    where
    sname = section_name nums section
 
 section_name :: [Int] -> String -> String
-section_name nums section = pretty_nums nums "" ++ section
+section_name nums section = pretty_nums nums " " ++ section
 
 -- A section can be converted to html
 instance HTML Section where
    toHtml sec = concatHtml $
-      section_title (number sec) (title sec) : map toHtml (stext sec) ++ map toHtml (subsections sec)
+      section_title (number sec) (title sec) (unique sec) : map toHtml (stext sec) ++ map toHtml (subsections sec)
 
 instance HTML Paragraph where
    toHtml para =
-      paragraph $ concatHtml $ ptext para
+      paragraph (concatHtml $ ptext para) ! [theclass $ pclass para]
 
 instance HTML Inline where
    toHtml inline =
