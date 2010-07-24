@@ -19,19 +19,42 @@ This file is part of The Simple Nice Manual Generator.
 -}
 
 -- | Read and output manuals
-module Manual where
+module Manual
+   (OutputType (..)
+   ,load_manual
+   ,write_manual
+   ,formats
+   ,text_format
+   ,xhtml_format) where
 
 import Manual.Reader
 import Manual.Emit
+import Manual.Structure
 
 import System.FilePath
 
--- | Create a text manual
-create_text_manual :: FilePath -> IO String
-create_text_manual =
-   fmap emit_text . load_manual
+import Data.Map (Map)
+import qualified Data.Map as M
 
--- | Write out a text file
-write_txt_file :: FilePath -> String -> IO ()
-write_txt_file filename txt =
-   writeFile (filename `addExtension` "txt") txt 
+-- | The output types
+data OutputType =
+     XHtml
+   | Text
+   deriving (Eq, Ord)
+
+
+-- | Write in a number of formats
+formats :: Map OutputType (Manual -> String, String)
+formats = M.fromList [(XHtml, xhtml_format)
+                     ,(Text, text_format)]
+
+xhtml_format :: (Manual -> String, String)
+xhtml_format = (emit_xhtml, "html")
+
+text_format :: (Manual -> String, String)
+text_format = (emit_text, "txt")
+
+-- | Write out a manual
+write_manual :: (Manual -> String) -> String -> Manual -> FilePath -> IO ()
+write_manual format ext man fil =
+   writeFile (fil `addExtension` ext) $ format man
