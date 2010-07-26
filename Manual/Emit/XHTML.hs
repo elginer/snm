@@ -95,17 +95,31 @@ instance HTML Section where
 
 instance HTML Paragraph where
    toHtml para =
-      paragraph (concatHtml $ ptext para) ! [theclass $ pclass para]
+      paragraph (concatHtml $ map (html_inline (wrap para)) (ptext para)) ! [theclass $ pclass para]
 
-instance HTML Inline where
-   toHtml inline =
+-- | Make an inline element into html   
+html_inline :: Bool -> Inline -> Html
+html_inline wrap inline = 
       case inline of
-         IText str -> stringToHtml $ str ++ " "
+         IText str -> (if wrap then stringToHtml else literal_spaces . stringToHtmlString) str
          ISectionLink text dest -> section_link text dest
          IExternLink text dest  -> extern_link text dest
-         IIndent -> concatHtml $ replicate 3 nbsp
-         ILine -> br
+     --    IIndent -> concatHtml $ replicate 3 nbsp
+   --      ILine -> br
          ILiteral t -> primHtml t
+
+-- | Convert all spaces and newlines into literal html spaces and newlines.
+literal_spaces :: String -> Html
+literal_spaces = concatHtml . map literal_space
+   where
+   literal_space c =
+      case c of
+         ' ' -> nbsp 
+         '\t' -> concatHtml $ replicate 6 nbsp
+         '\n' -> br
+         _    -> stringToHtml [c]
+         
+         
 
 -- | Internal link to elsewhere in the document
 section_link :: String -> URL -> Html

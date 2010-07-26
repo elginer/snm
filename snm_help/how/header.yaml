@@ -4,23 +4,26 @@ number: 1
 unique: header
 text:
    - "The header file has 1 required field:"
-   - text: "{indent}title: The title of the manual"
+   - text: "   title: The title of the manual"
+     wrap: False
      class: example
    - "The header file has 4 optional fields:"
    - text:
-      "{indent}copyright: The name of the person or people holding copyright over the document, and the year it was copyright.{line}
-      {indent}license: The name of the license by which the document is being distributed{line}
-      {indent}license_file: The file containing the license{line}
-      {indent}preamble: Zero or more {section paragraphs paragraph}, which are not included in the manual's {section contents contents}."
+         "   copyright: The name of the person or people holding copyright over the document, and the year it was copyright.
+        \n   license: The name of the license by which the document is being distributed
+        \n   license_file: The file containing the license
+        \n   preamble: Zero or more {section paragraphs paragraph}, which are not included in the manual's {section contents contents}."
      class: example
+     wrap: False
    - "For example, here is the header.yaml file for this document:"
    - text:
-        "{indent}title: The Simple Nice-Looking Manual Generator{line}
-         {indent}copyright: 'John Morrice 2010'{line}
-         {indent}license: GNU Free Documentation License{line}
-         {indent}license_file: 'DOC-COPYING'{line}
-         {indent}preamble:{line}
-         {indent}{indent}- 'The Simple Nice-Looking Manual Generator - aka snm - generates nice looking manuals from {external YAML http://www.yaml.org/} files.'{line}
-         {indent}{indent}- 'Currently, it can produce XHTML and text manuals.'"
+        "   title: The Simple Nice-Looking Manual Generator
+       \n   copyright: 'John Morrice 2010'
+       \n   license: GNU Free Documentation License
+       \n   license_file: 'DOC-COPYING'
+       \n   preamble:
+       \n      - 'The Simple Nice-Looking Manual Generator - aka snm - generates nice looking manuals from {external YAML http://www.yaml.org/} files.'
+       \n      - 'Currently, it can produce XHTML and text manuals.'"
      class: example
+     wrap: False
    - "You can see how snm processes this by looking at the {literal <a href='#'>top</a>} of the document."

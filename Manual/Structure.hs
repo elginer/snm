@@ -68,10 +68,10 @@ data Inline =
      }
    | -- | Literal text
      ILiteral String
-   | -- | A three space indent
+{-   | -- | A three space indent
      IIndent
    | -- | A new line
-     ILine
+     ILine -}
    deriving Show
 
 -- | A text paragraph
@@ -80,6 +80,8 @@ data Paragraph = Paragraph
      ptext :: ![Inline]
    , -- | The paragraph's class
      pclass :: String
+   , -- | Wrap the text
+     wrap :: Bool
    } 
    deriving Show
 

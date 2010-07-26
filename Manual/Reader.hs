@@ -52,7 +52,7 @@ import Control.Exception hiding (try)
 -- | Parse an inline element
 inline :: Parser Inline
 inline =
-   try text <|> try section_link <|> try extern_link <|> try iindent <|> try iliteral <|> iline
+   try text <|> try section_link <|> try extern_link <|> try iliteral -- <|> try iindent <|>  iline
    where
    iliteral = do
       char '{'
@@ -64,7 +64,7 @@ inline =
       char '}'
       return $ ILiteral text
 
-   iindent = simple "indent" IIndent
+{-   iindent = simple "indent" IIndent
 
    iline = simple "line" ILine
 
@@ -74,7 +74,7 @@ inline =
       string id
       spaces
       char '}'
-      return val
+      return val -}
 
    text :: Parser Inline
    text = fmap (IText . concat) $ many1 itext
@@ -90,12 +90,16 @@ inline =
       string name
       space
       spaces
-      txt <- many1 $ noneOf " \n\t\r"
+      fst_elem <- many1 $ noneOf " \n\t\r"
       spaces
-      uniq <- many1 $ noneOf " \n\t\r}"
+      rest <- sepEndBy1 end_id (space >> spaces)
       spaces
       char '}'
+      let uniq = last rest
+          txt = unwords $ fst_elem : init rest
       return $ f txt uniq
+      where
+      end_id = many1 $ noneOf " \n\t\r}"
 
 -- | Parse inline elements
 eparse_inline :: String -> Either ParseError [Inline]
@@ -119,15 +123,18 @@ instance Yamlable Paragraph where
    from_yaml y =
       case y of
          YStr s ->
-            liftM2 Paragraph (parse_inline s) (return "")
-         YMap m ->
-            liftM2 Paragraph (parse_inline $ ptext "text") (evaluate $ ptext "class")
+            liftM3 Paragraph (parse_inline s) (return "") (return True)
+         YMap m -> let mw = yookup "wrap" y in do
+            wrap <- maybe (return True) 
+                          (evaluate . fromMaybe (perror "Error parsing wrap field.  Must be True or False.") .  
+                             (\y -> ystr y >>= (readMay :: String -> Maybe Bool))) mw
+            liftM3 Paragraph (parse_inline $ ptext "text") (evaluate $ ptext "class") (evaluate wrap)
          _      -> throw $ new_error "Paragraph must be a string or a map"
       where
       -- Look up paragraph text from a map
       ptext :: String -> String
       ptext nm =
-         yext (yookup nm y) (throw $ new_error $ "Could not find field '" ++ nm ++ "' in paragraph map.  Must have members 'text' and 'class'")
+         yext (yookup nm y) (perror $ "Could not find field '" ++ nm ++ "' in paragraph map.  Must have members 'text' and 'class'")
 
       perror msg = throw $ 
          error_line "Error while reading Paragraph: " $

@@ -5,23 +5,26 @@ text:
    - "A section is associated with subsections when the subsection files are located in a directory which has the same filename (excluding extensions) as its section file, in its same directory."
    - "For example, here is a partial listing of this manual's source directory, snm_help:"
    - class: example
-     text: "{indent}snm_help:{line}
-            {indent}{indent}header.yaml{line}
-            {indent}{indent}how{line}
-            {indent}{indent}how.yaml{line}
-            {indent}{indent}...more files"
-   - "Note the file 'how.yaml'.  This is the file describing section 3 of this document."
+     wrap: False
+     text: "   snm_help:
+          \n      header.yaml
+          \n      how
+          \n      how.yaml
+          \n      ...more files"
+   - "Note the file 'how.yaml'.  This is the file describing {section section 3, How to use snm, how} of this document."
    - "Note also the directory called how.  This directory contains the subsections associated with how.yaml. Inside the how directory:"
    - class: example
-     text: "{indent}snm_help/how:{line}
-            {indent}{indent}section{line}
-            {indent}{indent}section.yaml{line}
-            {indent}{indent}...more files"
-   - "Note the 'section.yaml' file, which describes section 3.1, and its associated subsection directory 'section'."
+     wrap: False
+     text: "   snm_help/how:
+          \n      section
+          \n      section.yaml
+          \n      ...more files"
+   - "Note the 'section.yaml' file, which describes {section section 3.2, Sections sections} and its associated subsection directory 'section'."
    - "Inside the section directory:"
    - class: example
-     text: "{indent}snm_help/how/section:{line}
-            {indent}{indent}subsection.yaml"
+     wrap: False
+     text: "   snm_help/how/section:
+          \n      subsection.yaml"
    - "how/section/subsection.yaml is the file describing this section."
    - "A subsection's number is automatically computed by snm.  Hence, according to the file describing this section, this section's number is 1.  snm has discovered it is nested within section 3.2.  It is an error to specify a subsection's whole number within a section file.  Specify one number only!"
 

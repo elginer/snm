@@ -3,11 +3,13 @@ number: 3
 unique: paragraphs
 text:
    - "When a sequence of paragraphs is called for in a manual yaml file, either a single text element, or a yaml {external sequence http://yaml.kwiki.org/index.cgi?YamlInFiveMinutesMinuteOne} is expected."
-   - "Paragraphs are not just plain text:  they may contain inline elements like {section hyperlinks links} or {section formatting format} instructions."
+   - "Paragraphs are not just plain text:  they may contain {section inline elements inline} like hyperlinks or literal text."
    - "In a produced manual, a series of paragraphs are rendered with two line breaks between each of them.  This corresponds to two newline characters in a text document, and being within a <p> tag in an html document.  An example:"
    - class: example
-     text: "{indent}This is a valid, although boring, paragraph."
+     wrap: False
+     text: "   This is a valid, although boring, paragraph."
    - "Paragraphs can be associated with a class, using a yaml {external map http://yaml.kwiki.org/index.cgi?YamlInFiveMinutesMinuteTwo}.  When rendering xhtml documents, this class is becomes the value of the class attribute for the paragraph produced.  This is useful when working using a {section style-sheet style}.  An example:"
    - class: example
-     text: "{indent}class: curved_corner{line}
-            {indent}text: This paragraph is a bit more exciting, because it is being given curved corners by css!"
+     wrap: False
+     text: "   class: curved_corner
+          \n   text: This paragraph is a bit more exciting, because it is being given curved corners by css!"
