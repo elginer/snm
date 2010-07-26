@@ -2,6 +2,7 @@ title: What snm does and is
 unique: what
 number: 1
 text:
-   - "snm allows you to write clean, web-friendly reports without having to edit fickle html"
+   - "snm allows you to write clean, web-friendly reports, user guides and manuals without having to edit fickle html."
    - "snm allows you to structure your document in a modular fashion."
-   - "snm is a generator of valid xhtml, as long as its shortfalls aren't {section abused abuse}."
+   - "snm document sections are written in yaml and are easy to write and understand."
+   - "snm is a generator of valid xhtml."

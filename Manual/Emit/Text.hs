@@ -57,7 +57,7 @@ mock_shows s = (s ++)
 
 -- Prettify the section's number.
 pretty_nums :: [Int] -> ShowS
-pretty_nums nums = (intercalate "." (map show nums) ++)
+pretty_nums nums = (intercalate "." (map show nums) ++) . ('.' :)
 
 instance Pretty Paragraph where
    pretty' par _ =

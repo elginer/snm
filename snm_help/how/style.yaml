@@ -1,0 +1,5 @@
+title: "Style: CSS"
+number: 5
+unique: style
+text:
+   - "When generating xhtml, snm will look for a file called 'style.css' in the documentation source directory, and embed the contents of that file into the document's header as a CSS style sheet."

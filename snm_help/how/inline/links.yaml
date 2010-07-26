@@ -1,0 +1,22 @@
+title: Hyperlinks
+number: 1
+unique: links
+text:
+   - "snm supports two types of links."
+   - "Section links are hyperlinks to a {section section of the document sections}, using that section's unique name."
+   - "External links are a more traditional link to a URL."
+   - "As an inline element, links begin with an opening curly brace \{."
+   - "Then either the word 'section', which indicates a section link, or the word 'external' which indicates an external link."
+   - "Then the link text.  This may consist of a number of words separated by whitespace."
+   - "Then the destination.  No explicit syntax separates the link text from the destination - the last word is taken to be the destination.  Obviously, section links expect a section's unique name, whereas external links expect a URL."
+   - "As with all inline elements, a link is closed with a curly brace }."
+   - "Whitespace is optional throughout links."
+   - "Examples:"
+   - "The link above, which is a section link to the unique identifier 'sections':"
+   - class: example
+     wrap: False
+     text: "   \{section section of the document sections}"
+   - "The external link in {section section 3.3 Paragraphs paragraphs}, to the 'YAML in Five Minutes' tutorial"
+   - class: example
+     wrap: False
+     text: "   \{external sequence http://yaml.kwiki.org/index.cgi?YamlInFiveMinutesMinuteOne}"

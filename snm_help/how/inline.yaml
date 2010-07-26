@@ -1,5 +1,5 @@
 title: Inline Elements
-number: 1
+number: 4
 unique: inline
 text:
    - "Inline elements within paragraphs allow more expressive text.  The idea of an inline snm element is roughly equivalent to an inline HTML element.  Much as an xhtml anchor can only appear within an xhtml block element, an inline element can only appear within an snm paragraph."

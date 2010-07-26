@@ -1,0 +1,9 @@
+# This section discusses where to find help, problems with snm, what counts as abuse of these problems
+title: Further help, misuse and shortfalls
+number: 4
+unique: abuse
+text:
+   - "If you use snm and need more help than is available in this manual then do not hesitate to contact the author at spoon@killersmurf.com."
+   - "Please note that snm suffers from a number of shortfalls:"
+   - "Invalid xhtml can be generated through manipulation of the {section style sheet style}, {section literal text literal}, {section link destinations links}, and the {section unique names of sections sections}."
+   - "While I regret that this is possible, attempting xhtml kludges through these means ill-fitting means is misuse of snm and may result in generation shoddy manuals, a telling off and early bed-times all around.  You have been warned!"

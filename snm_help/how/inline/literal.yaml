@@ -1,0 +1,12 @@
+title: Literal text
+number: 2
+unique: literal
+text:
+   - "Literal text can be specified through the literal inline element."
+   - "Literal text is not processed or transformed by snm:  it is output directly into the output document."
+   - "This is risky because allows it you to write invalid xhtml, for instance; but it does allow you to write html that snm does not generate."
+   - "However, this approach suffers from many problems and is very much a working solution for current needs.  Problems are discussed {section below abuse}."
+   - "Example:"
+   - class: example
+     wrap: False
+     text: "   \{literal <table><td>Embed a html table</td></table>}"
