@@ -64,14 +64,11 @@ inline =
       char '}'
       return $ ILiteral text
 
-
    text :: Parser Inline
-   text = fmap (IText . concat) $ many1 itext
-
-   itext :: Parser String
-   itext =
-      try (string "\\{" >> return "{") <|>
-         many1 (noneOf "{")
+   text = fmap IText $
+      try (many1 $ noneOf "\\{") <|> 
+         try (string "\\{" >> return "{") <|>
+            (fmap return $ char '\\')
 
    section_link = link "section" ISectionLink
    extern_link = link "external" IExternLink
@@ -98,12 +95,16 @@ eparse_inline txt =
    if null txt
       then Right [IText ""]
       else 
-         parse (many1 inline) "" txt
+         parse (do
+            is <- many1 inline
+            eof
+            return is) "" txt
 
 -- | Parse inline elements
 parse_inline :: String -> IO [Inline]
 parse_inline txt = evaluate $
-   either (throw . error_line "Error while parsing inline elements from paragraph beginning:" . error_section . error_line (take 10 txt) . error_section . (flip error_lines empty_error) . lines . show) 
+   either (throw . error_line "Error while parsing inline elements from paragraph beginning:" . error_section . 
+             error_line (unwords (take 5 $ words txt) ++ "...") . error_section . (flip error_lines empty_error) . lines . show) 
           id
           (eparse_inline txt)
 

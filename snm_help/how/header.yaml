@@ -1,4 +1,4 @@
-# Note... note a header file for snm!
+# Note... not a header file for snm!
 title: header.yaml
 number: 1
 unique: header
@@ -27,3 +27,4 @@ text:
      class: example
      wrap: False
    - "You can see how snm processes this by looking at the {literal <a href='#'>top</a>} of the document."
+   - "When emitting xhtml, the notices displayed at the top of the page are automatically given the css class 'banner'."

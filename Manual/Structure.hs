@@ -68,10 +68,6 @@ data Inline =
      }
    | -- | Literal text
      ILiteral String
-{-   | -- | A three space indent
-     IIndent
-   | -- | A new line
-     ILine -}
    deriving Show
 
 -- | A text paragraph
