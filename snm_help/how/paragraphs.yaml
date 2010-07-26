@@ -8,8 +8,38 @@ text:
    - class: example
      wrap: False
      text: "   This is a valid, although boring, paragraph."
-   - "Paragraphs can be associated with a class, using a yaml {external map http://yaml.kwiki.org/index.cgi?YamlInFiveMinutesMinuteTwo}.  When rendering xhtml documents, this class is becomes the value of the class attribute for the paragraph produced.  This is useful when working using a {section style-sheet style}.  An example:"
+   - "Paragraphs can be associated with a class, using a yaml {external map http://yaml.kwiki.org/index.cgi?YamlInFiveMinutesMinuteTwo}.  When rendering xhtml documents, this class is becomes the value of the class attribute for the paragraph produced.  This is useful when working using a {section style sheet style}.  An example:"
    - class: example
      wrap: False
      text: "   class: curved_corner
           \n   text: This paragraph is a bit more exciting, because it is being given curved corners by css!"
+   - "Word wrapping can be turned on or off on a paragraph basis, by setting wrap to True or false in a map paragraph.  When emitting xhtml, if wrap is off, then all spaces are replaced by &nbsp; and all new-lines replaced by <br/>.  By default wrapping is on. Example:"
+   - "This paragraph..."
+   - class: example
+     wrap: False
+     text: "   wrap: False
+          \n   text: \"Hey ho,
+          \n          \\n  let's go!\""
+   - "Is rendered as:"
+   - class: example
+     wrap: False
+     text: "   \"Hey ho,
+          \n    \\n  let's go!\""
+   - "But this paragraph..."
+   - class: example
+     wrap: False
+     text: "   wrap: True
+          \n   text: \"Hey ho,
+          \n          \\n  let's go!\""
+   - "And this paragraph..."
+   - class: example
+     wrap: False
+     text: "   \"Hey ho,
+          \n    \\n  let's go!\""
+   - "Are rendered as:"
+   - class: example
+     wrap:  False
+     text: "   Hey ho, let's go!"
+
+
+

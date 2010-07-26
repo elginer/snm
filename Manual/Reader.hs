@@ -64,24 +64,15 @@ inline =
       char '}'
       return $ ILiteral text
 
-{-   iindent = simple "indent" IIndent
-
-   iline = simple "line" ILine
-
-   simple id val = do
-      char '{'
-      spaces
-      string id
-      spaces
-      char '}'
-      return val -}
 
    text :: Parser Inline
    text = fmap (IText . concat) $ many1 itext
+
    itext :: Parser String
    itext =
-      try (fmap return $ satisfy $ flip notElem "\\{")
-         <|> (string "\\{" >> return "{")
+      try (string "\\{" >> return "{") <|>
+         many1 (noneOf "{")
+
    section_link = link "section" ISectionLink
    extern_link = link "external" IExternLink
    link name f = do
@@ -124,11 +115,17 @@ instance Yamlable Paragraph where
       case y of
          YStr s ->
             liftM3 Paragraph (parse_inline s) (return "") (return True)
-         YMap m -> let mw = yookup "wrap" y in do
+         YMap m -> let mw = yookup "wrap" y 
+                       mcls = yookup "class" y in do
+           
             wrap <- maybe (return True) 
-                          (evaluate . fromMaybe (perror "Error parsing wrap field.  Must be True or False.") .  
+                         (evaluate . fromMaybe (perror "Error parsing wrap field.  Must be True or False.") .  
                              (\y -> ystr y >>= (readMay :: String -> Maybe Bool))) mw
-            liftM3 Paragraph (parse_inline $ ptext "text") (evaluate $ ptext "class") (evaluate wrap)
+            
+            clss <- maybe (return "")
+                          (evaluate . fromMaybe (perror "Error parsing class field.  Must be a string.") . ystr) mcls
+            
+            liftM3 Paragraph (parse_inline $ ptext "text") (evaluate clss) (evaluate wrap)
          _      -> throw $ new_error "Paragraph must be a string or a map"
       where
       -- Look up paragraph text from a map

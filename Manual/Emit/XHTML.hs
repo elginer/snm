@@ -117,7 +117,7 @@ literal_spaces = concatHtml . map literal_space
          ' ' -> nbsp 
          '\t' -> concatHtml $ replicate 6 nbsp
          '\n' -> br
-         _    -> stringToHtml [c]
+         _    -> primHtml [c]
          
          
 
