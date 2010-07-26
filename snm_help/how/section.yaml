@@ -1,0 +1,22 @@
+title: Sections
+number: 2
+unique: sections
+text:
+   - "An snm manual, much like other structured documents, is arranged into heirarchical sections and {section subsections subsections}."
+   - "Top level sections are described by yaml files in the documentation source directory."
+   - "A section file in the top directory can be given any filename, other than {section header.yaml header} and {section style.css style} which are reserved.  This restriction does not apply to subsections."
+   - "Each section has 4 required fields:"
+   - class: example
+     text: 
+        "{indent}title: the title of the section.  This section's title is 'Sections'{line}
+         {indent}number: the number of the section.  This section's number is 2.{line}
+         {indent}unique: A one-word, unique identifier for this section.  This is used in constructing {section hyperlinks links}.{line}
+         {indent}text: Zero or more {section paragraphs paragraphs}."
+   - "For a concrete example, here is the beginning of the section file for this section."
+   - class: example
+     text:
+        "{indent}title: Sections{line}
+         {indent}number: 2{line}
+         {indent}unique: sections{line}
+         {indent}text:{line}
+         {indent}{indent}- 'An snm manual, much like other structured documents, is arranged into heirarchical sections..."

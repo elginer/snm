@@ -1,0 +1,20 @@
+title: Formatting
+number: 1
+unique: format
+text:
+   - "snm provides inline formatting elements. These elements are introduced with a curly brace \{, contain a formatting instruction and are then closed with another curly brace }."
+   - "There are a number of formatting instructions.  The first:"
+   - class: example
+     text: "{indent}indent"
+   - "Indent creates a small indent into the page.  In the xhtml renderer, this is equivalent to three non-breaking spaces. The last paragraph began with an indent. Example:"
+   - class: example
+     text: "{indent}\{indent}This text has been indented three spaces."
+   - "Another formatting instruction:"
+   - class: example
+     text: "{indent}line"
+   - "Line inserts an additional line break.  In the xhtml renderer, this corresponds to <br/>.An example:"
+   - class: example
+     text: "{indent}This paragraph has a series of elements on different lines.\{line}\{line}{line}{line}
+            {indent}Element one\{line}{line}
+            {indent}Element two\{line}{line}
+            {indent}Element three\{line}{line}"

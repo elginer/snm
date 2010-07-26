@@ -77,7 +77,7 @@ data Inline =
 -- | A text paragraph
 data Paragraph = Paragraph
    { -- | The paragraph text
-     ptext :: [Inline]
+     ptext :: ![Inline]
    , -- | The paragraph's class
      pclass :: String
    } 
@@ -92,7 +92,7 @@ data Manual = Manual
    , -- | The manual's contents.
      mcontents :: Contents
    , -- | The sections of a manual.
-     sections :: [Section]
+     sections :: ![Section]
    }
    deriving Show
 
@@ -105,9 +105,9 @@ data Section = Section
    , -- | Unique name for this section
     unique :: String
    , -- | The section text
-    stext :: [Paragraph]
+    stext :: ![Paragraph]
      -- | Subsections
-   , subsections :: [Section]
+   , subsections :: ![Section]
    }
    deriving Show
 

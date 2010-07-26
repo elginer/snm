@@ -32,7 +32,7 @@ import Control.Arrow
 
 -- | Things that can be encoded as YAML
 class Yamlable y where
-   from_yaml :: Yaml -> y
+   from_yaml :: Yaml -> IO y
 
 -- | Yaml
 data Yaml =

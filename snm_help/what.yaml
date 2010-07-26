@@ -4,4 +4,4 @@ number: 1
 text:
    - "snm allows you to write clean, web-friendly reports without having to edit fickle html"
    - "snm allows you to structure your document in a modular fashion."
-   - "snm is a generator of valid xhtml, as long as you don't kludge {section style.css style}"
+   - "snm is a generator of valid xhtml, as long as its shortfalls aren't {section abused abuse}."

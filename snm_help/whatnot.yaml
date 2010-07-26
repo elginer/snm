@@ -2,7 +2,7 @@ title: What snm does not do and is not
 number: 2
 unique: whatnot
 text:
-   - "snm is not a man-page generator."
+   - "snm is not (currently) a man-page generator."
    - "snm is not a web-page creator"
    - "snm is not a gui based tool"
    - "snm is not an adult activity."
