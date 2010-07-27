@@ -54,17 +54,27 @@ import Control.Exception hiding (try)
 -- | Parse an inline element
 inline :: Parser Inline
 inline =
-   try text <|> try section_link <|> try extern_link <|> try iliteral -- <|> try iindent <|>  iline
+   try text <|> try section_link <|> try extern_link <|> try iliteral <|> try italic <|> try cls -- <|> try iindent <|>  iline
    where
-   iliteral = do
+   cls = string_element_attribute "class" IClass
+   italic = string_element "italic" IItalic
+
+   iliteral = string_element "literal" ILiteral
+
+   string_element nm f = inline_element nm $ do
+      text <- many1 $ noneOf "\n\t\r}"
+      return $ f text
+
+   inline_element nm ma = do
       char '{'
       spaces
-      string "literal"
+      string nm
+      space
       spaces
-      text <- many1 $ noneOf "\n\t\r}"
+      a <- ma
       spaces
       char '}'
-      return $ ILiteral text
+      return a
 
    text :: Parser Inline
    text = fmap IText $
@@ -72,19 +82,13 @@ inline =
          try (string "\\{" >> return "{") <|>
             (fmap return $ char '\\')
 
-   section_link = link "section" ISectionLink
-   extern_link = link "external" IExternLink
-   link name f = do
-      char '{'
-      spaces
-      string name
-      space
-      spaces
+   section_link = string_element_attribute "section" ISectionLink
+   extern_link = string_element_attribute "external" IExternLink
+
+   string_element_attribute name f = inline_element name $ do
       fst_elem <- many1 $ noneOf " \n\t\r"
       spaces
       rest <- sepEndBy1 end_id (space >> spaces)
-      spaces
-      char '}'
       let uniq = last rest
           txt = unwords $ fst_elem : init rest
       return $ f txt uniq

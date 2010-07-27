@@ -112,9 +112,9 @@ html_inline wrap inline =
          IText str -> (if wrap then stringToHtml else literal_spaces . stringToHtmlString) str
          ISectionLink text dest -> section_link text dest
          IExternLink text dest  -> extern_link text dest
-     --    IIndent -> concatHtml $ replicate 3 nbsp
-   --      ILine -> br
          ILiteral t -> primHtml t
+         IItalic t -> italics $ stringToHtml t
+         IClass t c -> thespan (stringToHtml t) ! [theclass c]
 
 -- | Convert all spaces and newlines into literal html spaces and newlines.
 literal_spaces :: String -> Html
