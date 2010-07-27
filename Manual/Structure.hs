@@ -23,12 +23,24 @@ This file is part of The Simple Nice Manual Generator.
 -}
 
 -- | The structure of a manual
-module Manual.Structure where
+module Manual.Structure
+   (Manual (..)
+   ,Header (..)
+   ,Contents (..)
+   ,Section (..)
+   ,Banner (..)
+   ,Paragraph (..)
+   ,Inline (..)
+   ,pretty_nums
+   ,contents)
+   where
 
 import System.FilePath
 import System.Directory
 
 import Data.List
+
+import Text.Pretty
 
 -- | We just see a CSS file as a string
 type CSS = String
@@ -116,3 +128,73 @@ data Contents =
    Contents [Contents]
    | Entry [Int] String String
    deriving Show
+
+-- | Create the manual's contents
+contents :: [Section] -> Contents
+contents =
+   Contents . gather_sections
+
+gather_sections :: [Section] -> [Contents]
+gather_sections ss = 
+   concatMap subsection_contents $ 
+      sortBy (\s1 s2 -> number s1 `compare` number s2) ss
+
+subsection_contents :: Section -> [Contents]
+subsection_contents s =
+   if null $ subsections s
+      then [me]
+      else [me , Contents $ gather_sections (subsections s)]
+   where
+   me = Entry (number s) (pretty $ title s) (unique s)
+
+instance Pretty Banner where
+   pretty' ban _ =
+      pretty_list' (btext ban) 0
+
+instance Pretty Inline where
+   pretty' inline _ =
+      case inline of
+         IText str -> mock_shows str
+         ISectionLink text dest -> mock_shows text
+         IExternLink text dest -> mock_shows text . mock_shows " (see " . mock_shows dest . mock_shows ")"
+         -- IIndent -> mock_shows "   "
+         -- ILine -> nl
+         ILiteral t -> mock_shows t
+
+mock_shows :: String -> ShowS
+mock_shows s = (s ++) 
+
+instance Pretty Contents where
+   pretty' c sp =
+      case c of
+         Entry nums name _ -> pspace sp . pretty_nums nums . ((' ' : name) ++)
+         Contents cs -> pretty_list' cs $ sp + 1
+
+-- Pretty print manuals
+instance Pretty Manual where
+   pretty' man _ =
+      pretty' (header man) 0 . nl . nl . 
+         pretty' (mcontents man) (-1) . nl . nl . nl .
+            pretty_list' (sections man) 0
+
+instance Pretty Section where
+   pretty' sec _ =
+      pretty_nums (number sec) . (' ' :) . pretty' (title sec) 0 . nl . nl . 
+         pretty_list_nl' (stext sec) 0 . nl . nl . nl .
+            (if null $ subsections sec
+               then id
+               else pretty_list' (subsections sec) 0)
+
+-- Prettify the section's number.
+pretty_nums :: [Int] -> ShowS
+pretty_nums nums = (intercalate "." (map show nums) ++) . ('.' :)
+
+instance Pretty Paragraph where
+   pretty' par _ =
+      pretty_list' (ptext par) 0
+
+instance Pretty Header where
+   pretty' head _ =
+      pretty' (mtitle head) 0 . nl . nl . nl .
+           pretty_list_nl' (banners head) 0 . nl . nl . nl .
+           pretty_list_nl' (preamble head) 0

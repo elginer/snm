@@ -22,11 +22,11 @@ This file is part of The Simple Nice Manual Generator.
 
 -}
 
-module Manual.Emit.XHTML where
+module Manual.Emit.XHTML
+   (render_manual_xhtml)
+   where
 
 import Manual.Structure
-import Manual.Emit.Text
-
 import Text.Pretty
 
 import Text.XHtml.Strict hiding (header,title,style)

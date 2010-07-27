@@ -26,7 +26,6 @@ This file is part of The Simple Nice Manual Generator.
 module Manual.Emit where
 
 import Manual.Emit.XHTML
-import Manual.Emit.Text
 import Manual.Structure
 
 import Text.Pretty

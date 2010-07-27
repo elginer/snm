@@ -19,7 +19,7 @@ This file is part of The Simple Nice Manual Generator.
 -}
 
 -- | Read and output manuals
-module Manual
+module Manual.Easy
    (OutputType (..)
    ,load_manual
    ,write_manual

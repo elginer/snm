@@ -29,7 +29,7 @@ text:
    - class: example
      wrap: False
      text: "   \"Hey ho,
-          \n    \\n  let's go!\""
+          \n        let's go!\""
    - "But this paragraph..."
    - class: example
      wrap: False

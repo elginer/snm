@@ -30,7 +30,7 @@ text:
           \n      the same filename as the documentation source directory, with an 
           \n      appropriate extension added.
           \n      snm will always add an appropriate extension to output files.
-          \n      By default, snm will produce snm, and act as if the user had 
+          \n      By default, snm will produce xhtml, and act as if the user had 
           \n      specified -o without an argument.
           \n
           \n      -d               --dump                  Print output to stdout.

@@ -1,24 +1,22 @@
 -- Generate simple and nice looking manuals
 
-import Manual
+import Manual.Easy
 
 import System.Environment
 import System.Console.GetOpt
-
-import Data.Maybe
-
-import Data.List
+import System.IO
 
 import System.FilePath
 
 import Control.Monad
 
+import Data.Maybe
 import Data.Map (Map)
 import qualified Data.Map as M
+import Data.List
 
-import Data.Maybe
 
-import System.IO
+
 
 -- Flags determine how we should behave
 data ManFlag =

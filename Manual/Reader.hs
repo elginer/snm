@@ -23,11 +23,11 @@ This file is part of The Simple Nice Manual Generator.
 -}
 
 -- | Read a manual from its source files
-module Manual.Reader where
+module Manual.Reader
+   (load_manual
+   ,load_section) where
 
 import Manual.Structure
--- You'd think it's pretty weird that the Reader would import the Emitter, but it's to manufacture the contents
-import Manual.Emit.Text
 
 import Data.Yaml.Simple
 
