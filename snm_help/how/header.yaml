@@ -30,6 +30,6 @@ text:
        \n      - \"This document is released under the terms of the GNU Free Documentation License. See the file {external DOC-COPYING DOC-COPYING} for details\"
        \n      - \"All snm source code is released under the terms of the GNU General Public Licence Version 3.  See the file {external COPYING COPYING} for details.\"
        \n      - \"The Simple Nice-Looking Manual Generator - A.K.A snm - generates nice looking manuals from {external YAML http://www.yaml.org/} files.\"
-       \n  - \"Currently, it can produce XHTML and text manuals.\""
+       \n      - \"Currently, it can produce XHTML and text manuals.\""
    - "You can see how snm processes this by looking at the {external top #} of the document."
    - "When emitting xhtml, the notices displayed at the top of the page are automatically given the css class 'banner'."

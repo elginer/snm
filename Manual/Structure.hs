@@ -82,8 +82,6 @@ data Inline =
      }
    | -- | Literal text
      ILiteral String
-   | -- | Italics
-     IItalic String
    | -- | Inline class
      IClass String String
    deriving Show
@@ -162,7 +160,6 @@ instance Pretty Inline where
          ISectionLink text dest -> mock_shows text
          IExternLink text dest -> mock_shows text . mock_shows " (see " . mock_shows dest . mock_shows ")"
          ILiteral t -> mock_shows t
-         IItalic t  -> mock_shows t
          IClass t _  -> mock_shows t
 
 mock_shows :: String -> ShowS

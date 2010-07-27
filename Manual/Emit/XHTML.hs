@@ -113,7 +113,6 @@ html_inline wrap inline =
          ISectionLink text dest -> section_link text dest
          IExternLink text dest  -> extern_link text dest
          ILiteral t -> primHtml t
-         IItalic t -> italics $ stringToHtml t
          IClass t c -> thespan (stringToHtml t) ! [theclass c]
 
 -- | Convert all spaces and newlines into literal html spaces and newlines.

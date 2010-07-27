@@ -54,11 +54,9 @@ import Control.Exception hiding (try)
 -- | Parse an inline element
 inline :: Parser Inline
 inline =
-   try text <|> try section_link <|> try extern_link <|> try iliteral <|> try italic <|> try cls -- <|> try iindent <|>  iline
+   try text <|> try section_link <|> try extern_link <|> try iliteral <|> try cls -- <|> try iindent <|>  iline
    where
    cls = string_element_attribute "class" IClass
-   italic = string_element "italic" IItalic
-
    iliteral = string_element "literal" ILiteral
 
    string_element nm f = inline_element nm $ do

@@ -1,0 +1,26 @@
+# Copyright John Morrice 2010
+# This document is part of The Simple Nice-Looking Manual Generator documentation
+# This document is released under the terms of the GNU Free Documentation Licence
+# See the file DOC-COPYING.
+
+title: Inline classes
+number: 3
+unique: inlineclass
+text:
+   - "snm supports inline classes.  This allows a section of text to have a different style to the rest of the text block."
+   - "An inline class in an inline element beginning with the word class, and lasting until the closing brace."
+   - "An example:"
+   - class: example
+     wrap: False
+     text:
+       "   class: quote
+       \n   text: \"Don't make me angry. You wouldn't like me when I'm angry\" \{class -- David Banner, The Incredible Hulk, 1978. aside}"
+   - "The text within the class element is assigned the class 'aside', allowing it to be rendered differently from the rest of the paragraph."
+   - "In the xhtml renderer, an inline class element:"
+   - class: example
+     wrap: False
+     text: "   \{class the text goes here x}"
+   - "Corresponds to a span element thus:"
+   - class: example
+     wrap: False
+     text: "   <span class=\"x\">the text goes here</span>
