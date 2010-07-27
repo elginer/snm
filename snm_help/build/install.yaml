@@ -1,0 +1,15 @@
+# Copyright John Morrice 2010
+# This document is part of The Simple Nice-Looking Manual Generator documentation
+# This document is released under the terms of the GNU Free Documentation Licence
+# See the file DOC-COPYING.
+
+title: Install snm to /usr/bin
+number: 3
+unique: install
+text:
+   - "cabal install typically installs snm into your local cabal directory, usually ~/.cabal/bin/snm"
+   - "So you'll probably need to:"
+   - class: example
+     wrap: False
+     text: "   sudo cp ~/.cabal/bin/snm /usr/bin"
+   - "Now, try to {section invoke invoke} snm"

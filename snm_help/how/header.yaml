@@ -1,30 +1,35 @@
+# Copyright John Morrice 2010
+# This document is part of The Simple Nice-Looking Manual Generator documentation
+# This document is released under the terms of the GNU Free Documentation Licence
+# See the file DOC-COPYING.
+
 # Note... not a header file for snm!
 title: header.yaml
 number: 1
 unique: header
 text:
    - "The header file has 1 required field:"
-   - text: "   title: The title of the manual"
+   - text: "   title: A {section banner banners}, the title of the manual."
      wrap: False
      class: example
-   - "The header file has 4 optional fields:"
+   - "The header file has 2 optional fields:"
    - text:
-         "   copyright: The name of the person or people holding copyright over the document, and the year it was copyright.
-        \n   license: The name of the license by which the document is being distributed
-        \n   license_file: The file containing the license
+       "   banners: Zero or more {section banners banners}, used to announce important things at the start of a manual, for example, its author. 
         \n   preamble: Zero or more {section paragraphs paragraph}, which are not included in the manual's {section contents contents}."
      class: example
      wrap: False
-   - "For example, here is the header.yaml file for this document:"
-   - text:
-        "   title: The Simple Nice-Looking Manual Generator
-       \n   copyright: 'John Morrice 2010'
-       \n   license: GNU Free Documentation License
-       \n   license_file: 'DOC-COPYING'
-       \n   preamble:
-       \n      - 'The Simple Nice-Looking Manual Generator - aka snm - generates nice looking manuals from {external YAML http://www.yaml.org/} files.'
-       \n      - 'Currently, it can produce XHTML and text manuals.'"
-     class: example
+   - "For example, here is a slightly simplified version of the header.yaml file for this document:"
+   - class: example
      wrap: False
-   - "You can see how snm processes this by looking at the {literal <a href='#'>top</a>} of the document."
+     text:
+        "   title: \"The Simple Nice-Looking Manual Generator\"
+       \n   banners:
+       \n      - \"Copyright John Morrice 2010\"
+       \n      - \"Contact spoon@killersmurf.com\"
+       \n   preamble:
+       \n      - \"This document is released under the terms of the GNU Free Documentation License. See the file {external DOC-COPYING DOC-COPYING} for details\"
+       \n      - \"All snm source code is released under the terms of the GNU General Public Licence Version 3.  See the file {external COPYING COPYING} for details.\"
+       \n      - \"The Simple Nice-Looking Manual Generator - A.K.A snm - generates nice looking manuals from {external YAML http://www.yaml.org/} files.\"
+       \n  - \"Currently, it can produce XHTML and text manuals.\""
+   - "You can see how snm processes this by looking at the {external top #} of the document."
    - "When emitting xhtml, the notices displayed at the top of the page are automatically given the css class 'banner'."

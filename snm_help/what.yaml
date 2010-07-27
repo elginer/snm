@@ -1,3 +1,7 @@
+# Copyright John Morrice 2010
+# This document is part of The Simple Nice-Looking Manual Generator documentation
+# This document is released under the terms of the GNU Free Documentation Licence
+# See the file DOC-COPYING.
 title: What snm does and is
 unique: what
 number: 1
@@ -5,4 +9,4 @@ text:
    - "snm allows you to write clean, web-friendly reports, user guides and manuals without having to edit fickle html."
    - "snm allows you to structure your document in a modular fashion."
    - "snm document sections are written in yaml and are easy to write and understand."
-   - "snm is a generator of valid xhtml."
+   - "snm is a generator of small, valid xhtml files."

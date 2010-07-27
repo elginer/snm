@@ -1,3 +1,8 @@
+# Copyright John Morrice 2010
+# This document is part of The Simple Nice-Looking Manual Generator documentation
+# This document is released under the terms of the GNU Free Documentation Licence
+# See the file DOC-COPYING.
+
 title: Sections
 number: 2
 unique: sections
@@ -9,7 +14,7 @@ text:
    - class: example
      wrap: False
      text: 
-        "   title: the title of the section.  This section's title is 'Sections'
+        "   title: A {section banner banners}, the title of the section.  This section's title is 'Sections'
        \n   number: the number of the section.  This section's number is 2.
        \n   unique: A one-word, unique identifier for this section.  This is used in constructing {section hyperlinks links}.
        \n   text: Zero or more {section paragraphs paragraphs}."

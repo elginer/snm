@@ -1,0 +1,43 @@
+# Copyright John Morrice 2010
+# This document is part of The Simple Nice-Looking Manual Generator documentation
+# This document is released under the terms of the GNU Free Documentation Licence
+# See the file DOC-COPYING.
+title: Invoking snm
+number: 4
+unique: invoke
+text:
+   - "Once it is {section installed install}, try invoking snm with"
+   - class: example
+     wrap: False
+     text: "   snm --help"
+   - "If it was successfully installed, you will see some helpful information and a list of snm's command line options:"
+   - class: example
+     wrap: False
+     text: "   snm: The Simple Nice-Looking Manual Generator
+          \n
+          \n   usage: 
+          \n      snm documentation_source_directory options*
+          \n
+          \n   Where options* stands for zero or more of the options below.
+          \n
+          \n   Note:
+          \n      Only one output format is permitted per invocation.
+          \n      If -d or --dump is used, snm will not write a file unless -o or 
+          \n      --output is  used.
+          \n      There can be no whitespace between -o and its argument, nor can
+          \n      there be whitespace between --output= and its argument.
+          \n      If no arguments are given to -o, then the file written will have 
+          \n      the same filename as the documentation source directory, with an 
+          \n      appropriate extension added.
+          \n      snm will always add an appropriate extension to output files.
+          \n      By default, snm will produce snm, and act as if the user had 
+          \n      specified -o without an argument.
+          \n
+          \n      -d               --dump                  Print output to stdout.
+          \n      -o[A file name]  --output[=A file name]  Write output to a file.  
+          \n                                               Multiple outputs ignored, 
+          \n                                               printing warning to 
+          \n                                               stderr.
+          \n      -h               --help                  Print usage information
+          \n      -t               --text, --txt           Text output.
+          \n      -x               --xhtml, --html         Output in xhtml format."

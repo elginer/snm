@@ -1,0 +1,21 @@
+# Copyright John Morrice 2010
+# This document is part of The Simple Nice-Looking Manual Generator documentation
+# This document is released under the terms of the GNU Free Documentation Licence
+# See the file DOC-COPYING.
+
+title: The Hard Way
+number: 2
+unique: hard
+text:
+   - "To build snm the hard way, you must install:"
+   - "{external The Glasgow Haskell Compiler http://haskell.org/ghc/}.  snm has been tested with GHC 6.10.4"
+   - "And from {external Hackage http://hackage.haskell.org}, the following libraries"
+   - "base>=4, parsec>=3, filepath, directory, containers, HsSyck, safe, SpoonsUtilities, xhtml"
+   - "Download the source distribution of snm from github"
+   - "cd into its directory."
+   - "Run:"
+   - class: example
+     wrap: False
+     text: "   cabal install"
+   - "Now {section install snm to /usr/bin install}"
+

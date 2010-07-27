@@ -1,6 +1,10 @@
+# Copyright John Morrice 2010
+# This document is part of The Simple Nice-Looking Manual Generator documentation
+# This document is released under the terms of the GNU Free Documentation Licence
+# See the file DOC-COPYING.
 title: How to use snm
 unique: how
-number: 3
+number: 5
 text:
    - "snm generates a manual from a number of yaml files, held in a documentation source directory.  In the snm source distribution, this directory is called 'snm_help'."
    - "This source directory must contain a file called 'header.yaml'.  The next sub-section deals with what you put in header.yaml, and what it means."

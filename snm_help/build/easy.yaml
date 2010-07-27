@@ -1,0 +1,13 @@
+# Copyright John Morrice 2010
+# This document is part of The Simple Nice-Looking Manual Generator documentation
+# This document is released under the terms of the GNU Free Documentation Licence
+# See the file DOC-COPYING.
+
+title: The Easy Way
+number: 1
+unique: easy
+text:
+   - "First install {external The Haskell Platform http://hackage.haskell.org/platform/}."
+   - "Then just do:"
+   - "cabal install snm"
+   - "Now {section install snm to /usr/bin install}"

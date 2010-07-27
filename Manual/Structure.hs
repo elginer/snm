@@ -33,18 +33,20 @@ import Data.List
 -- | We just see a CSS file as a string
 type CSS = String
 
+-- | A banner for the top of the document
+data Banner = Banner 
+   {btext :: ![Inline]
+   ,bclass :: !String}
+   deriving Show
+
 -- | A manual's header file
 data Header = Header 
    { -- | The name of the manual
-     mtitle :: String
-   , -- | Copyright notice
-     copyright :: String
-   , -- | License
-     license :: String
-   , -- | License File
-     license_file :: String
+     mtitle :: !Banner
+   , -- | Banners
+     banners :: ![Banner]
    , -- | Preamble, not linked in the manual's contents.
-     preamble :: [Paragraph] 
+     preamble :: ![Paragraph] 
    }
    deriving Show
 
@@ -99,7 +101,7 @@ data Section = Section
    { -- | The section's number.
      number :: [Int]
    , -- | The title of the section
-    title :: String
+    title :: Banner 
    , -- | Unique name for this section
     unique :: String
    , -- | The section text
@@ -114,21 +116,3 @@ data Contents =
    Contents [Contents]
    | Entry [Int] String String
    deriving Show
-
-contents :: [Section] -> Contents
-contents =
-   Contents . gather_sections
-
-gather_sections :: [Section] -> [Contents]
-gather_sections ss = 
-   concatMap subsection_contents $ 
-      sortBy (\s1 s2 -> number s1 `compare` number s2) ss
-
-subsection_contents :: Section -> [Contents]
-subsection_contents s =
-   if null $ subsections s
-      then [me]
-      else [me , Contents $ gather_sections (subsections s)]
-   where
-   me = Entry (number s) (title s) (unique s)
-

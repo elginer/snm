@@ -29,7 +29,7 @@ import Manual.Emit.Text
 
 import Text.Pretty
 
-import Text.XHtml.Strict hiding (copyright,header,title,style)
+import Text.XHtml.Strict hiding (header,title,style)
 import qualified Text.XHtml.Strict as X
 
 import Data.Char
@@ -43,20 +43,18 @@ instance HTML Manual where
    toHtml man =
       X.header (concatHtml [meta ! [httpequiv "Content-Type"
                                    ,content "text/html;charset=utf-8"]
-                           , thetitle $ stringToHtml $ mtitle $ header man
+                           , thetitle $ stringToHtml $ pretty $ mtitle $ header man
                            , X.style (primHtml $ style man) ! [thetype "text/css"]]) +++ 
          (body $ concatHtml $ toHtml (header man) : toHtml (mcontents man) : map toHtml (sections man))
 
 -- The header can be converted to html
 instance HTML Header where
-   toHtml head = concatHtml $ map ((! [theclass "banner"]) . toHtml)
-      [htitle $ mtitle head
-      , hinfo $ copy_notice $ copyright head
-      , hinfo $ license_notice $ license head
-      , h2 $ concatHtml
-         [stringToHtml "See the file " 
-         ,(anchor (stringToHtml $ license_file head) ! [href $ license_file head])
-         ,stringToHtml " for copying conditions."]] ++ map toHtml (preamble head)
+   toHtml head = concatHtml $
+      (h1 (toHtml $ mtitle head) ! intro_ban_class (mtitle head)) : map (\b -> (h2 $ toHtml b) ! intro_ban_class b) (banners head) ++ map toHtml (preamble head)
+
+-- | Get the banner class for banners in the introduction
+intro_ban_class :: Banner -> [HtmlAttr]
+intro_ban_class = ban_class "intro_banner"
 
 -- The contents
 instance HTML Contents where
@@ -73,19 +71,11 @@ hcontents i c =
          let sname = section_name nums str
          in  concatHtml $ replicate (3 * i) nbsp ++ [section_link sname unique, br]
 
-htitle :: String -> Html
-htitle = h1 . stringToHtml
-
-hinfo :: String -> Html
-hinfo = h2 . stringToHtml
-
-section_title :: [Int] -> String -> String -> Html
+section_title :: [Int] -> Banner -> String -> Html
 section_title nums section unique = 
-   h2 $ (anchor $ stringToHtml sname) ! [name unique]
-   where
-   sname = section_name nums section
+   (h2 $ (anchor $ stringToHtml (pretty_nums nums " ") +++ toHtml section) ! [name unique]) ! section_ban_class section
 
-section_name :: [Int] -> String -> String
+section_name :: [Int] -> String -> String 
 section_name nums section = pretty_nums nums " " ++ section
 
 -- A section can be converted to html
@@ -96,6 +86,24 @@ instance HTML Section where
 instance HTML Paragraph where
    toHtml para =
       paragraph (concatHtml $ map (html_inline (wrap para)) (ptext para)) ! [theclass $ pclass para]
+
+-- Convert banners into html
+instance HTML Banner where
+   toHtml ban =
+      concatHtml $ map (html_inline True) (btext ban)
+
+-- | Banners for the sections
+section_ban_class :: Banner -> [HtmlAttr]
+section_ban_class = ban_class "banner"
+
+-- | The banner's class
+ban_class :: String -> Banner -> [HtmlAttr]
+ban_class def ban = [theclass cls]
+   where
+   cls = 
+      if null $ bclass ban
+         then def
+         else bclass ban      
 
 -- | Make an inline element into html   
 html_inline :: Bool -> Inline -> Html

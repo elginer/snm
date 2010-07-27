@@ -1,7 +1,13 @@
+# Copyright John Morrice 2010
+# This document is part of The Simple Nice-Looking Manual Generator documentation
+# This document is released under the terms of the GNU Free Documentation Licence
+# See the file DOC-COPYING.
+
 title: Inline Elements
-number: 4
+number: 5
 unique: inline
 text:
-   - "Inline elements within paragraphs allow more expressive text.  The idea of an inline snm element is roughly equivalent to an inline HTML element.  Much as an xhtml anchor can only appear within an xhtml block element, an inline element can only appear within an snm paragraph."
-   - "Inline elements appear within curly braces \{ }.  When writing a paragraph, the opening brace may be escaped with a backslash \, which will result in a literal opening brace."
+   - "Inline elements within paragraphs and banners allow more expressive text.  The idea of an inline snm element is roughly equivalent to an inline HTML element.  Much as an xhtml anchor can only appear within an xhtml block element, an inline element can only appear within an snm paragraph or banner."
+   - "Inline elements appear within curly braces \{ }."
+   - "If you need to actually write an opening brace in your document, the opening brace may be escaped with a backslash \."
    - "The following inline elements are available: section links, external links and literal text."

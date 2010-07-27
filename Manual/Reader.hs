@@ -26,6 +26,8 @@ This file is part of The Simple Nice Manual Generator.
 module Manual.Reader where
 
 import Manual.Structure
+-- You'd think it's pretty weird that the Reader would import the Emitter, but it's to manufacture the contents
+import Manual.Emit.Text
 
 import Data.Yaml.Simple
 
@@ -110,6 +112,27 @@ parse_inline txt = evaluate $
 
 -- I say the orphan instances are okay because this is a module EXCLUSIVELY for reading in the manual
 
+-- Read a banner from a yaml description
+instance Yamlable Banner where
+   from_yaml y =
+      case y of
+         YStr s -> liftM2 Banner (parse_inline s) (return "") 
+         YMap _ -> let mcls = yookup "class" y in do
+            clss <- maybe (return "")
+                          (evaluate . fromMaybe (berror "Error parsing class field.  Must be a string.") . ystr) mcls
+            txt <- maybe (return [])
+                         (maybe (evaluate $ berror "Error parsing text field.") parse_inline . ystr) $ yookup "text" y
+
+            when (null txt) $ evaluate $ berror "Banner text cannot be empty"
+            evaluate $ Banner txt clss
+         _      -> berror "Banner must be a string or a map."
+      where
+      berror msg = throw $ 
+         error_line "Error while reading Banner: " $
+            error_section $ error_line msg $ error_section $ 
+               error_lines ["Reading yaml:", show y] $ empty_error
+
+
 -- Convert a yaml description of a paragraph into a paragraph.
 instance Yamlable Paragraph where
    from_yaml y =
@@ -160,7 +183,7 @@ instance Yamlable Section where
       mps <- paras $ yookup "text" y
       ps <- maybe (serror "text") evaluate mps
       liftM5 Section (evaluate [snumber $ yookup "number" y])
-              (evaluate $ stitle $ yookup "title" y)
+              (stitle $ yookup "title" y)
               (evaluate $ read_key (serror "unique") $ yookup "unique" y)
               (return ps)
               (return [])
@@ -169,12 +192,17 @@ instance Yamlable Section where
          fromMaybe (serror "number")  $ a >>= ystr >>= readMay 
 
       stitle =
-         read_key (serror "title")
+         read_mbanner (serror "title")
 
       serror msg = throw $ 
          error_line "Error while reading Section:" $ error_section $
             error_line ("Section did not have a valid '" ++ msg ++ "' member.") $ error_section $
                error_lines ["Reading yaml:", show y] empty_error
+
+-- | Read a banner from what might be some yaml
+read_mbanner :: Banner -> Maybe Yaml -> IO Banner
+read_mbanner ba =
+   maybe (evaluate ba) from_yaml
 
 read_key :: String -> Maybe Yaml -> String 
 read_key err ma = not_empty err $ yext ma err
@@ -237,17 +265,18 @@ paras ma =
 
 -- Load a header file
 instance Yamlable Header where
-   from_yaml y =
-      liftM5 Header (evaluate title)
-                    (evaluate copyright)
-                    (evaluate license)
-                    (evaluate license_file)
+   from_yaml y = let mb = yookup "banners" y in do
+      bs <- maybe (return []) (\ybs ->
+         case ybs of
+            YStr _ -> fmap return $ from_yaml ybs
+            YSeq ys -> mapM from_yaml ys
+            YMap _   -> fmap return $ from_yaml ybs
+            _       -> herror "banner") mb
+      liftM3 Header title
+                    (evaluate bs)
                     preamble
       where
-      title = read_key (herror "title") $ yookup "title" y
-      copyright = read_key (herror "copyright") $ yookup "copyright" y
-      license = read_key (herror "license") $ yookup "license" y
-      license_file = read_key (herror "license_file") $ yookup "license_file" y
+      title = read_mbanner (herror "title") $ yookup "title" y
       preamble = fmap (fromMaybe []) $ paras $ yookup "preamble" y
       herror nm = throw $ 
          error_line "Error while reading Header:" $

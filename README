@@ -1,5 +1,369 @@
-The Simple Nice Manual Generator
+The Simple Nice-Looking Manual Generator
+
 
 Copyright John Morrice 2010
 
-The simple nice manual generator generates nice looking xhtml manuals from source files.
+Contact spoon@killersmurf.com
+
+
+This document is released under the terms of the GNU Free Documentation License. See the file DOC-COPYING (see DOC-COPYING) for details
+
+All snm source code is released under the terms of the GNU General Public Licence Version 3.  See the file COPYING (see COPYING) for details.
+
+The Simple Nice-Looking Manual Generator - A.K.A snm - generates nice looking manuals from YAML (see http://www.yaml.org/) files.
+
+Currently, it can produce XHTML and text manuals.
+
+
+1. What snm does and is
+2. What snm does not do and is not
+3. Building snm
+   3.1. The Easy Way
+   3.2. The Hard Way
+   3.3. Install snm to /usr/bin
+4. Invoking snm
+5. How to use snm
+   5.1. header.yaml
+   5.2. Sections
+      5.2.1. Subsections
+   5.3. Paragraphs
+   5.4. Banners
+   5.5. Inline Elements
+      5.5.1. Hyperlinks
+      5.5.2. Literal text
+   5.6. Style: CSS
+6. Further help, misuse and shortfalls
+
+
+1. What snm does and is
+
+snm allows you to write clean, web-friendly reports, user guides and manuals without having to edit fickle html.
+
+snm allows you to structure your document in a modular fashion.
+
+snm document sections are written in yaml and are easy to write and understand.
+
+snm is a generator of small, valid xhtml files.
+
+
+2. What snm does not do and is not
+
+snm is not (currently) a man-page generator.
+
+snm is not a web-page creator
+
+snm is not a gui based tool
+
+snm is not an adult activity.
+
+
+3. Building snm
+
+First, install libsyck (see http://yaml.kwiki.org/index.cgi?LibSyck).
+
+Then choose to proceed to build snm in either The Easy Way or The Hard Way.
+
+The hard way is presented to give more information to people who may need it.  The Easy Way is recommended for absolutely everyone else!
+
+
+3.1. The Easy Way
+
+First install The Haskell Platform (see http://hackage.haskell.org/platform/).
+
+Then just do:
+
+cabal install snm
+
+Now install snm to /usr/bin
+
+
+3.2. The Hard Way
+
+To build snm the hard way, you must install:
+
+The Glasgow Haskell Compiler (see http://haskell.org/ghc/).  snm has been tested with GHC 6.10.4
+
+And from Hackage (see http://hackage.haskell.org), the following libraries
+
+base>=4, parsec>=3, filepath, directory, containers, HsSyck, safe, SpoonsUtilities, xhtml
+
+Download the source distribution of snm from github
+
+cd into its directory.
+
+Run:
+
+   cabal install
+
+Now install snm to /usr/bin
+
+
+3.3. Install snm to /usr/bin
+
+cabal install typically installs snm into your local cabal directory, usually ~/.cabal/bin/snm
+
+So you'll probably need to:
+
+   sudo cp ~/.cabal/bin/snm /usr/bin
+
+Now, try to invoke snm
+
+
+4. Invoking snm
+
+Once it is installed, try invoking snm with
+
+   snm --help
+
+If it was successfully installed, you will see some helpful information and a list of snm's command line options:
+
+   snm: The Simple Nice-Looking Manual Generator 
+ 
+   usage:  
+      snm documentation_source_directory options* 
+ 
+   Where options* stands for zero or more of the options below. 
+ 
+   Note: 
+      Only one output format is permitted per invocation. 
+      If -d or --dump is used, snm will not write a file unless -o or  
+      --output is  used. 
+      There can be no whitespace between -o and its argument, nor can 
+      there be whitespace between --output= and its argument. 
+      If no arguments are given to -o, then the file written will have  
+      the same filename as the documentation source directory, with an  
+      appropriate extension added. 
+      snm will always add an appropriate extension to output files. 
+      By default, snm will produce snm, and act as if the user had  
+      specified -o without an argument. 
+ 
+      -d               --dump                  Print output to stdout. 
+      -o[A file name]  --output[=A file name]  Write output to a file.   
+                                               Multiple outputs ignored,  
+                                               printing warning to  
+                                               stderr. 
+      -h               --help                  Print usage information 
+      -t               --text, --txt           Text output. 
+      -x               --xhtml, --html         Output in xhtml format.
+
+
+5. How to use snm
+
+snm generates a manual from a number of yaml files, held in a documentation source directory.  In the snm source distribution, this directory is called 'snm_help'.
+
+This source directory must contain a file called 'header.yaml'.  The next sub-section deals with what you put in header.yaml, and what it means.
+
+
+5.1. header.yaml
+
+The header file has 1 required field:
+
+   title: A banner, the title of the manual.
+
+The header file has 2 optional fields:
+
+   banners: Zero or more banners, used to announce important things at the start of a manual, for example, its author.  
+   preamble: Zero or more paragraphs, which are not included in the manual's contents.
+
+For example, here is a slightly simplified version of the header.yaml file for this document:
+
+   title: "The Simple Nice-Looking Manual Generator" 
+   banners: 
+      - "Copyright John Morrice 2010" 
+      - "Contact spoon@killersmurf.com" 
+   preamble: 
+      - "This document is released under the terms of the GNU Free Documentation License. See the file DOC-COPYING (see DOC-COPYING) for details" 
+      - "All snm source code is released under the terms of the GNU General Public Licence Version 3.  See the file COPYING (see COPYING) for details." 
+      - "The Simple Nice-Looking Manual Generator - A.K.A snm - generates nice looking manuals from YAML (see http://www.yaml.org/) files." 
+  - "Currently, it can produce XHTML and text manuals."
+
+You can see how snm processes this by looking at the top (see #) of the document.
+
+When emitting xhtml, the notices displayed at the top of the page are automatically given the css class 'banner'.
+
+
+5.2. Sections
+
+An snm manual, much like other structured documents, is arranged into heirarchical sections and subsections.
+
+Top level sections are described by yaml files in the documentation source directory.
+
+A section file in the top directory can be given any filename, other than header.yaml and style.css which are reserved.  This restriction does not apply to subsections.
+
+Each section has 4 required fields:
+
+   title: A banner, the title of the section.  This section's title is 'Sections' 
+   number: the number of the section.  This section's number is 2. 
+   unique: A one-word, unique identifier for this section.  This is used in constructing hyperlinks. 
+   text: Zero or more paragraphs.
+
+For a concrete example, here is the beginning of the section file for this section.
+
+   title: Sections 
+   number: 2 
+   unique: sections 
+   text: 
+      - 'An snm manual, much like other structured documents, is arranged into heirarchical sections...
+
+
+5.2.1. Subsections
+
+A section is associated with subsections when the subsection files are located in a directory which has the same filename (excluding extensions) as its section file, in its same directory.
+
+For example, here is a partial listing of this manual's source directory, snm_help:
+
+   snm_help: 
+      header.yaml 
+      how 
+      how.yaml 
+      ...more files
+
+Note the file 'how.yaml'.  This is the file describing section 3, How to use snm, of this document.
+
+Note also the directory called how.  This directory contains the subsections associated with how.yaml. Inside the how directory:
+
+   snm_help/how: 
+      section 
+      section.yaml 
+      ...more files
+
+Note the 'section.yaml' file, which describes section 3.2, Sections and its associated subsection directory 'section'.
+
+Inside the section directory:
+
+   snm_help/how/section: 
+      subsection.yaml
+
+how/section/subsection.yaml is the file describing this section.
+
+A subsection's number is automatically computed by snm.  Hence, according to the file describing this section, this section's number is 1.  snm has discovered it is nested within section 3.2.  It is an error to specify a subsection's whole number within a section file.  Specify one number only!
+
+
+5.3. Paragraphs
+
+When a sequence of paragraphs is called for in a manual yaml file, either a single text element, or a yaml sequence (see http://yaml.kwiki.org/index.cgi?YamlInFiveMinutesMinuteOne) is expected.
+
+Paragraphs are not just plain text:  they may contain inline elements like hyperlinks or literal text.
+
+In a produced manual, a series of paragraphs are rendered with two line breaks between each of them.  This corresponds to two newline characters in a text document, and being within a <p> tag in an html document.  An example:
+
+   This is a valid, although boring, paragraph.
+
+Paragraphs can be associated with a class, using a yaml map (see http://yaml.kwiki.org/index.cgi?YamlInFiveMinutesMinuteTwo).  When rendering xhtml documents, this class is becomes the value of the class attribute for the paragraph produced.  This is useful when working using a style sheet.  An example:
+
+   class: curved_corner 
+   text: This paragraph is a bit more exciting, because it is being given curved corners by css!
+
+Word wrapping can be turned on or off on a paragraph basis, by setting wrap to True or false in a map paragraph.  When emitting xhtml, if wrap is off, then all spaces are replaced by &nbsp; and all new-lines replaced by <br/>.  By default wrapping is on. Example:
+
+This paragraph...
+
+   wrap: False 
+   text: "Hey ho, 
+          \n  let's go!"
+
+Is rendered as:
+
+   "Hey ho, 
+    \n  let's go!"
+
+But this paragraph...
+
+   wrap: True 
+   text: "Hey ho, 
+          \n  let's go!"
+
+And this paragraph...
+
+   "Hey ho, 
+    \n  let's go!"
+
+Are rendered as:
+
+   Hey ho, let's go!
+
+
+5.4. Banners
+
+Banners appear at the top of the manual, and at the beginning of sections.
+
+Banners may contain inline elements in the same manner as a paragraph.
+
+Banner defined in the header file are, by default, given the class 'intro_banner'.  Banners defined in sections are given the class 'banner'.
+
+The default banner classes can be replaced by user defined classes, in the same manner that a class can be assigned to a paragraph.
+
+
+5.5. Inline Elements
+
+Inline elements within paragraphs and banners allow more expressive text.  The idea of an inline snm element is roughly equivalent to an inline HTML element.  Much as an xhtml anchor can only appear within an xhtml block element, an inline element can only appear within an snm paragraph or banner.
+
+Inline elements appear within curly braces { }.
+
+If you need to actually write an opening brace in your document, the opening brace may be escaped with a backslash \.
+
+The following inline elements are available: section links, external links and literal text.
+
+
+5.5.1. Hyperlinks
+
+snm supports two types of links.
+
+Section links are hyperlinks to a section of the document, using that section's unique name.
+
+External links are a more traditional link to a URL.
+
+As an inline element, links begin with an opening curly brace {.
+
+Then either the word 'section', which indicates a section link, or the word 'external' which indicates an external link.
+
+Then the link text.  This may consist of a number of words separated by whitespace.
+
+Then the destination.  No explicit syntax separates the link text from the destination - the last word is taken to be the destination.  Obviously, section links expect a section's unique name, whereas external links expect a URL.
+
+As with all inline elements, a link is closed with a curly brace }.
+
+Whitespace is optional throughout links.
+
+Examples:
+
+The link above, which is a section link to the unique identifier 'sections':
+
+   {section section of the document sections}
+
+The external link in section 3.3 Paragraphs, to the 'YAML in Five Minutes' tutorial
+
+   {external sequence http://yaml.kwiki.org/index.cgi?YamlInFiveMinutesMinuteOne}
+
+
+5.5.2. Literal text
+
+Literal text can be specified through the literal inline element.
+
+Literal text is not processed or transformed by snm:  it is output directly into the output document.
+
+This is risky because allows it you to write invalid xhtml, for instance; but it does allow you to write html that snm does not generate.
+
+However, this approach suffers from many problems and is very much a working solution for current needs.  Problems are discussed below.
+
+Example:
+
+   {literal <table><td>Embed a html table</td></table>}
+
+
+5.6. Style: CSS
+
+When generating xhtml, snm will look for a file called 'style.css' in the documentation source directory, and embed the contents of that file into the document's header as a CSS style sheet.
+
+
+6. Further help, misuse and shortfalls
+
+If you use snm and need more help than is available in this manual then do not hesitate to contact the author at spoon@killersmurf.com.
+
+Please note that snm suffers from a number of shortfalls:
+
+Invalid xhtml can be generated through manipulation of the style sheet, literal text, link destinations, and the unique names of sections.
+
+While I regret that this is possible, attempting xhtml kludges through these means ill-fitting means is misuse of snm and may result in generation shoddy manuals, a telling off and early bed-times all around.  You have been warned!
+
+

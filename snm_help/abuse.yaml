@@ -1,6 +1,10 @@
+# Copyright John Morrice 2010
+# This document is part of The Simple Nice-Looking Manual Generator documentation
+# This document is released under the terms of the GNU Free Documentation Licence
+# See the file DOC-COPYING.
 # This section discusses where to find help, problems with snm, what counts as abuse of these problems
 title: Further help, misuse and shortfalls
-number: 4
+number: 6
 unique: abuse
 text:
    - "If you use snm and need more help than is available in this manual then do not hesitate to contact the author at spoon@killersmurf.com."

@@ -63,7 +63,7 @@ help =
 -- The user requests output in xhtml
 xhtml_out :: OptDescr ManFlag
 xhtml_out =
-   Option "xh" ["xhtml", "html"] (NoArg $ OutputType XHtml) "Output in xhtml format." 
+   Option "x" ["xhtml", "html"] (NoArg $ OutputType XHtml) "Output in xhtml format." 
 
 -- The user requests output in text
 text_out :: OptDescr ManFlag
@@ -84,7 +84,19 @@ output_file =
 usage :: IO ()
 usage = do
    nm <- getProgName
-   putStrLn $ usageInfo (nm ++ ": The Simple Nice-Looking Manual Generator") options
+   putStrLn $ usageInfo 
+      (unlines [nm ++ ": The Simple Nice-Looking Manual Generator"
+              ,"\nusage: "
+              ,"   " ++ nm ++ " documentation_source_directory options*"
+              ,"\nWhere options* stands for zero or more of the options below."
+              ,"\nNote:"
+              ,"   Only one output format is permitted per invocation."
+              ,"   If -d or --dump is used, snm will not write a file unless -o or --output is also used."
+              ,"   There can be no whitespace between -o and its argument, nor can there be whitespace between --output= and its argument"
+              ,"   If no arguments are given to -o, then the file written will have the same filename as the documentation source directory, with an appropriate extension added."
+              ,"   " ++ nm ++ " will always add an appropriate extension to output files." 
+              ,"   By default, snm will emit xhtml, and act as if the user had specified -o without an argument."])
+      options
 
 
 -- "Make it so" - Jean Luc Picard. 
@@ -96,9 +108,9 @@ main = do
    let (unclean_flags, non, err) = getOpt order options as
        -- clean the flags
        flags = nub unclean_flags
-       user_outputs = catMaybes $ map (flip M.lookup formats) $ map out_type $ filter only_types flags
+       user_output = msum $ map (flip M.lookup formats) $ map out_type $ filter only_types flags
 
-       outputs = if null user_outputs then [xhtml_format] else user_outputs
+       output = fromMaybe (xhtml_format) user_output
    -- terminate if there were errors
    if null err
       then do
@@ -108,12 +120,12 @@ main = do
                -- did the user tell us what to do?
                if null flags
                   then
-                     mapM_ (uncurry (undirected input man)) outputs
+                     uncurry (undirected input man) output
                   else
                      if elem Help flags
                         then usage
                         else 
-                           mapM_ (uncurry (directed man flags input)) outputs
+                           uncurry (directed man flags input) output
             _ -> usage
       else 
          usage
@@ -125,12 +137,11 @@ main = do
              dump = elem Dump flags 
          -- dump the text if dump is present
          when dump $ putStrLn $ format man
-         nm <- getProgName
          mout <- case outs of
                     (out:[]) -> return $ Just out
                     (out:n:_) -> do
                        hPutStrLn stderr 
-                                 ("Warning: " ++ nm ++ " multiple outputs ignored.")
+                                 ("Warning: multiple outputs ignored.")
                        return (Just out)
                     _        -> return Nothing
          maybe (return ()) 

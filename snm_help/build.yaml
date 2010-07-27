@@ -1,0 +1,11 @@
+# Copyright John Morrice 2010
+# This document is part of The Simple Nice-Looking Manual Generator documentation
+# This document is released under the terms of the GNU Free Documentation Licence
+# See the file DOC-COPYING.
+title: Building snm
+number: 3
+unique: build
+text:
+   - "First, install {external libsyck http://yaml.kwiki.org/index.cgi?LibSyck}."
+   - "Then choose to proceed to build snm in either {section The Easy Way easy} or {section The Hard Way hard}."
+   - "The hard way is presented to give more information to people who may need it.  The Easy Way is recommended for absolutely everyone else!"

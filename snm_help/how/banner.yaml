@@ -1,0 +1,15 @@
+# Copyright John Morrice 2010
+# This document is part of The Simple Nice-Looking Manual Generator documentation
+# This document is released under the terms of the GNU Free Documentation Licence
+# See the file DOC-COPYING.
+
+title: Banners
+number: 4
+unique: banners
+text:
+   - "Banners appear at the top of the manual, and at the beginning of sections."
+   - "Banners may contain inline elements in the same manner as a paragraph."
+
+   - "Banner defined in the {section header header} file are, by default, given the class 'intro_banner'.  Banners defined in {section sections sections} are given the class 'banner'."
+   
+   - "The default banner classes can be replaced by user defined classes, in the same manner that a class can be assigned to a paragraph."

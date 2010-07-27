@@ -31,6 +31,24 @@ import Text.Pretty
 
 import Data.List
 
+contents :: [Section] -> Contents
+contents =
+   Contents . gather_sections
+
+gather_sections :: [Section] -> [Contents]
+gather_sections ss = 
+   concatMap subsection_contents $ 
+      sortBy (\s1 s2 -> number s1 `compare` number s2) ss
+
+subsection_contents :: Section -> [Contents]
+subsection_contents s =
+   if null $ subsections s
+      then [me]
+      else [me , Contents $ gather_sections (subsections s)]
+   where
+   me = Entry (number s) (pretty $ title s) (unique s)
+
+
 instance Pretty Contents where
    pretty' c sp =
       case c of
@@ -40,17 +58,17 @@ instance Pretty Contents where
 -- Pretty print manuals
 instance Pretty Manual where
    pretty' man _ =
-      pretty' (header man) 0 . nl . 
-         pretty' (mcontents man) (-1) . nl . nl .
+      pretty' (header man) 0 . nl . nl . 
+         pretty' (mcontents man) (-1) . nl . nl . nl .
             pretty_list' (sections man) 0
 
 instance Pretty Section where
    pretty' sec _ =
-      pretty_nums (number sec) . (' ' :) . mock_shows (title sec) . nl . nl . 
-         pretty_list_nl' (stext sec) 0 . nl . nl .
+      pretty_nums (number sec) . (' ' :) . pretty' (title sec) 0 . nl . nl . 
+         pretty_list_nl' (stext sec) 0 . nl . nl . nl .
             (if null $ subsections sec
                then id
-               else pretty_list' (subsections sec) 0 . nl)
+               else pretty_list' (subsections sec) 0)
 
 mock_shows :: String -> ShowS
 mock_shows s = (s ++) 
@@ -77,18 +95,20 @@ license_file_notice fi = "See the file " ++ fi ++  " for details."
 
 instance Pretty Header where
    pretty' head _ =
-      mock_shows (mtitle head) . nl . nl .
-         mock_shows (copy_notice $ copyright head) . nl .
-            mock_shows (license_notice $ license head) . nl .
-               mock_shows (license_file_notice $ license_file head) . nl . nl .
-                  pretty_list_nl' (preamble head) 0
+      pretty' (mtitle head) 0 . nl . nl . nl .
+           pretty_list_nl' (banners head) 0 . nl . nl . nl .
+           pretty_list_nl' (preamble head) 0
+
+instance Pretty Banner where
+   pretty' ban _ =
+      pretty_list' (btext ban) 0
 
 instance Pretty Inline where
    pretty' inline _ =
       case inline of
          IText str -> mock_shows str
          ISectionLink text dest -> mock_shows text
-         IExternLink text dest -> mock_shows text . mock_shows "(see " . mock_shows dest . mock_shows ")"
+         IExternLink text dest -> mock_shows text . mock_shows " (see " . mock_shows dest . mock_shows ")"
          -- IIndent -> mock_shows "   "
          -- ILine -> nl
          ILiteral t -> mock_shows t
