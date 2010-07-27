@@ -1,6 +1,5 @@
 Name:           snm 
-Version:	0.0.1
-Cabal-Version:  >= 1.2
+Version:	0.0.2
 License:	GPL-3
 License-File:   COPYING	
 Author:		John Morrice <spoon@killersmurf.com>
@@ -15,6 +14,8 @@ Description:
 		snm document sections are written in yaml and are easy to write and understand.
 		.
 		snm is a generator of small, valid xhtml files.
+		.
+		Read the snm manual online: http://www.killersmurf.com/static/snm_help.html
 
 Build-type:	Simple
 Homepage:	http://github.com/elginer/snm
