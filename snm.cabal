@@ -7,6 +7,7 @@ Author:		John Morrice
 Category:	Documentation
 Synopsis:       The Simple Nice-Looking Manual Generator. 
 Build-type:	Simple
+Homepage:	http://github.com/elginer/snm
 
 Library
    Build-Depends: base>=4, parsec>=3, filepath, directory, containers, HsSyck, SpoonsUtilities, safe, xhtml

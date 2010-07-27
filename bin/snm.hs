@@ -125,14 +125,14 @@ main = do
                      if elem Help flags
                         then usage
                         else 
-                           uncurry (directed man flags input) output
+                           uncurry (directed input man flags input) output
             _ -> usage
       else 
          usage
       where
      
       -- The user has specified what to do
-      directed man flags defaul format ext = do
+      directed input man flags defaul format ext = do
          let outs = filter only_output flags
              dump = elem Dump flags 
          -- dump the text if dump is present
@@ -143,7 +143,7 @@ main = do
                        hPutStrLn stderr 
                                  ("Warning: multiple outputs ignored.")
                        return (Just out)
-                    _        -> return Nothing
+                    _        -> if dump then return Nothing else return $ Just $ OutputFile Nothing
          maybe (return ()) 
                (\out ->
                   write_manual format ext man $ output_dir defaul out)

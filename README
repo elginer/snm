@@ -14,6 +14,8 @@ The Simple Nice-Looking Manual Generator - A.K.A snm - generates nice looking ma
 
 Currently, it can produce XHTML and text manuals.
 
+snm is hosted on github (see http://github.com/elginer/snm)
+
 
 1. What snm does and is
 2. What snm does not do and is not

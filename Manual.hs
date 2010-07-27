@@ -52,7 +52,7 @@ xhtml_format :: (Manual -> String, String)
 xhtml_format = (emit_xhtml, "html")
 
 text_format :: (Manual -> String, String)
-text_format = (emit_text, "")
+text_format = (emit_text, "txt")
 
 -- | Write out a manual
 write_manual :: (Manual -> String) -> String -> Manual -> FilePath -> IO ()

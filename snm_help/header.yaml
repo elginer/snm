@@ -13,3 +13,4 @@ preamble:
      text: "All snm source code is released under the terms of the GNU General Public Licence Version 3.  See the file {external COPYING COPYING} for details."
    - "The Simple Nice-Looking Manual Generator - A.K.A snm - generates nice looking manuals from {external YAML http://www.yaml.org/} files."
    - "Currently, it can produce XHTML and text manuals."
+   - "snm is {external hosted on github http://github.com/elginer/snm}"
