@@ -25,7 +25,8 @@ This file is part of The Simple Nice Manual Generator.
 -- | Read a manual from its source files
 module Manual.Reader
    (load_manual
-   ,load_section) where
+   ,load_section
+   ,eparse_inline) where
 
 import Manual.Structure
 
@@ -33,6 +34,7 @@ import Data.Yaml.Simple
 
 import Text.Parsec
 import Text.Parsec.String
+import Text.Parsec.Prim
 
 import Data.Either
 import Data.Maybe
@@ -50,20 +52,27 @@ import qualified Data.Set as S
 import Control.Monad
 import Control.Exception hiding (try)
 
-
 -- | Parse an inline element
 inline :: Parser Inline
 inline =
-   try text <|> try section_link <|> try extern_link <|> try iliteral <|> try cls -- <|> try iindent <|>  iline
-   where
-   cls = string_element_attribute "class" IClass
-   iliteral = string_element "literal" ILiteral
+   try text <|> bracketed
 
-   string_element nm f = inline_element nm $ do
-      text <- many1 $ noneOf "\n\t\r}"
-      return $ f text
+bracketed :: Parser Inline   
+bracketed = try section_link <|> try extern_link <|> try iliteral <|> try cls
 
-   inline_element nm ma = do
+cls :: Parser Inline
+cls = inlines_element_attribute "class" IClass
+
+iliteral :: Parser Inline
+iliteral = string_element "literal" ILiteral
+
+string_element :: String -> (String -> Inline) -> Parser Inline
+string_element nm f = inline_element nm $ do
+   text <- many1 $ noneOf "}"
+   return $ f text
+
+inline_element :: String -> Parser Inline -> Parser Inline
+inline_element nm ma = do
       char '{'
       spaces
       string nm
@@ -74,24 +83,35 @@ inline =
       char '}'
       return a
 
-   text :: Parser Inline
-   text = fmap IText $
-      try (many1 $ noneOf "\\{") <|> 
-         try (string "\\{" >> return "{") <|>
-            (fmap return $ char '\\')
+text :: Parser Inline
+text = fmap IText $
+   try (many1 $ noneOf "\\{") <|> 
+      try (string "\\{" >> return "{") <|>
+         (fmap return $ char '\\')
 
-   section_link = string_element_attribute "section" ISectionLink
-   extern_link = string_element_attribute "external" IExternLink
+section_link = inlines_element_attribute  "section" ISectionLink
+extern_link = inlines_element_attribute "external" IExternLink
 
-   string_element_attribute name f = inline_element name $ do
-      fst_elem <- many1 $ noneOf " \n\t\r"
-      spaces
-      rest <- sepEndBy1 end_id (space >> spaces)
-      let uniq = last rest
-          txt = unwords $ fst_elem : init rest
-      return $ f txt uniq
-      where
-      end_id = many1 $ noneOf " \n\t\r}"
+nested :: Parser Inline
+nested = try bracketed <|> try (do
+   s <- many1 $ noneOf " {\n\r\t}"
+   return $ IText $ ' ' : s)
+
+
+inlines_element_attribute :: String -> ([Inline] -> String -> Inline) -> Parser Inline 
+inlines_element_attribute name f = inline_element name $ do
+   fst_elem <- nested
+   space
+   spaces
+   rest <- sepEndBy1 nested  
+                     (space >> spaces)
+   let uniqi = last rest
+       txt = fst_elem : init rest
+      -- This is sooo much of a hack because there isn't a decent grammar.
+   uniq <- case uniqi of
+              IText t -> return t
+              _       -> unexpected "nested inline element: the last element should be a string."
+   return $ f txt uniq
 
 -- | Parse inline elements
 eparse_inline :: String -> Either ParseError [Inline]

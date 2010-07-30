@@ -69,7 +69,7 @@ hcontents i c =
       Contents cs -> concatHtml $ map (hcontents $ i + 1) cs
       Entry nums str unique ->
          let sname = section_name nums str
-         in  concatHtml $ replicate (3 * i) nbsp ++ [section_link sname unique, br]
+         in  concatHtml $ replicate (3 * i) nbsp ++ [section_link (stringToHtml sname) unique, br]
 
 section_title :: [Int] -> Banner -> String -> Html
 section_title nums section unique = 
@@ -105,15 +105,19 @@ ban_class def ban = [theclass cls]
          then def
          else bclass ban      
 
+-- Html instance for inline elements
+instance HTML Inline where
+   toHtml = html_inline True
+
 -- | Make an inline element into html   
 html_inline :: Bool -> Inline -> Html
 html_inline wrap inline = 
       case inline of
          IText str -> (if wrap then stringToHtml else literal_spaces . stringToHtmlString) str
-         ISectionLink text dest -> section_link text dest
-         IExternLink text dest  -> extern_link text dest
+         ISectionLink text dest -> section_link (concatHtml $ map toHtml text) dest
+         IExternLink text dest  -> extern_link (concatHtml $ map toHtml text) dest
          ILiteral t -> primHtml t
-         IClass t c -> thespan (stringToHtml t) ! [theclass c]
+         IClass t c -> thespan (concatHtml $ map toHtml t) ! [theclass c]
 
 -- | Convert all spaces and newlines into literal html spaces and newlines.
 literal_spaces :: String -> Html
@@ -126,12 +130,11 @@ literal_spaces = concatHtml . map literal_space
          '\n' -> br
          _    -> primHtml [c]
          
-         
 
 -- | Internal link to elsewhere in the document
-section_link :: String -> URL -> Html
-section_link text dest = toHtml $ hotlink ('#':dest) (stringToHtml text)
+section_link :: Html -> URL -> Html
+section_link text dest = toHtml $ hotlink ('#':dest) text
 
 -- | External link to something else
-extern_link :: String -> URL -> Html
-extern_link text dest = toHtml $ hotlink dest (stringToHtml text)
+extern_link :: Html -> URL -> Html
+extern_link text dest = toHtml $ hotlink dest text

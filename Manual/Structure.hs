@@ -69,21 +69,21 @@ data Inline =
    | -- | A link to another section
      ISectionLink
      { -- | The link text.
-       ltext :: String
+       ltext :: [Inline]
      , -- | The section number
        ldest :: String 
      }
    | -- | An external link.
      IExternLink
      { -- | The link text.
-       ltext :: String
+       ltext :: [Inline]
      , -- | The link destination.
        ldest :: String
      }
    | -- | Literal text
      ILiteral String
    | -- | Inline class
-     IClass String String
+     IClass [Inline] String
    deriving Show
 
 -- | A text paragraph
@@ -157,10 +157,10 @@ instance Pretty Inline where
    pretty' inline _ =
       case inline of
          IText str -> mock_shows str
-         ISectionLink text dest -> mock_shows text
-         IExternLink text dest -> mock_shows text . mock_shows " (see " . mock_shows dest . mock_shows ")"
+         ISectionLink text dest -> pretty_list' text 0
+         IExternLink text dest -> pretty_list' text 0 . mock_shows " (see " . mock_shows dest . mock_shows ")"
          ILiteral t -> mock_shows t
-         IClass t _  -> mock_shows t
+         IClass t _  -> pretty_list' t 0
 
 mock_shows :: String -> ShowS
 mock_shows s = (s ++) 
@@ -175,8 +175,9 @@ instance Pretty Contents where
 instance Pretty Manual where
    pretty' man _ =
       pretty' (header man) 0 . nl . nl . 
-         pretty' (mcontents man) (-1) . nl . nl . nl .
-            pretty_list' (sections man) 0
+         mock_shows "Contents:" . nl .
+            pretty' (mcontents man) (-1) . nl . nl . nl .
+               pretty_list' (sections man) 0
 
 instance Pretty Section where
    pretty' sec _ =
