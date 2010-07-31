@@ -31,6 +31,10 @@ module Manual.Structure
    ,Banner (..)
    ,Paragraph (..)
    ,Inline (..)
+   ,ManEnv (..)
+   ,SyntaxHighlighter
+   ,CSS
+   ,new_man_env
    ,pretty_nums
    ,contents)
    where
@@ -41,6 +45,28 @@ import System.Directory
 import Data.List
 
 import Text.Pretty
+
+import Data.Yaml.Simple
+
+import qualified Data.Map as M
+import Data.Map (Map)
+
+-- | The syntax highlighter.
+type SyntaxHighlighter = String -- ^ Given text it produces...
+                       -> (CSS, String, String) -- ^ ...the class for that element first, the consumed input second, the unconsumed input last.
+
+-- | An environment for processing a manual
+data ManEnv = ManEnv
+   { -- | Syntax processors.
+     syntax :: Map String SyntaxHighlighter   
+   }
+
+instance Show ManEnv where
+   show = const $ "ManEnv"
+
+-- | Create a new manual environment
+new_man_env :: ManEnv
+new_man_env = ManEnv M.empty
 
 -- | We just see a CSS file as a string
 type CSS = String
@@ -84,6 +110,8 @@ data Inline =
      ILiteral String
    | -- | Inline class
      IClass [Inline] String
+   | -- | Elements with a formal language
+     ILanguage [Inline] String
    deriving Show
 
 -- | A text paragraph
@@ -92,6 +120,8 @@ data Paragraph = Paragraph
      ptext :: ![Inline]
    , -- | The paragraph's class
      pclass :: String
+   , -- | The paragraph's formal language
+     language :: String
    , -- | Wrap the text
      wrap :: Bool
    } 
@@ -103,6 +133,8 @@ data Manual = Manual
      header :: Header
    , -- | The style used in the manual.
      style  :: CSS
+   , -- | An environment accessed when emitting
+     man_env :: ManEnv
    , -- | The manual's contents.
      mcontents :: Contents
    , -- | The sections of a manual.
@@ -161,6 +193,7 @@ instance Pretty Inline where
          IExternLink text dest -> pretty_list' text 0 . mock_shows " (see " . mock_shows dest . mock_shows ")"
          ILiteral t -> mock_shows t
          IClass t _  -> pretty_list' t 0
+         ILanguage t _ -> pretty_list' t 0
 
 mock_shows :: String -> ShowS
 mock_shows s = (s ++) 

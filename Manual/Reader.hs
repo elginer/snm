@@ -39,6 +39,11 @@ import Text.Parsec.Prim
 import Data.Either
 import Data.Maybe
 import Data.List
+import qualified Data.Set as S
+
+import qualified Data.Map as M
+
+import Data.Dynamic
 
 import Error.Report
 
@@ -46,8 +51,7 @@ import Safe
 
 import System.FilePath
 import System.Directory
-
-import qualified Data.Set as S
+import System.Plugins
 
 import Control.Monad
 import Control.Exception hiding (try)
@@ -58,7 +62,10 @@ inline =
    try text <|> bracketed
 
 bracketed :: Parser Inline   
-bracketed = try section_link <|> try extern_link <|> try iliteral <|> try cls
+bracketed = try section_link <|> try extern_link <|> try iliteral <|> try cls <|> ilang
+
+ilang :: Parser Inline
+ilang = inlines_element_attribute "language" ILanguage
 
 cls :: Parser Inline
 cls = inlines_element_attribute "class" IClass
@@ -160,9 +167,10 @@ instance Yamlable Paragraph where
    from_yaml y =
       case y of
          YStr s ->
-            liftM3 Paragraph (parse_inline s) (return "") (return True)
+            liftM4 Paragraph (parse_inline s) (return "") (return "") (return True)
          YMap m -> let mw = yookup "wrap" y 
-                       mcls = yookup "class" y in do
+                       mcls = yookup "class" y 
+                       mlang = yookup "language" y in do
            
             wrap <- maybe (return True) 
                          (evaluate . fromMaybe (perror "Error parsing wrap field.  Must be True or False.") .  
@@ -171,7 +179,10 @@ instance Yamlable Paragraph where
             clss <- maybe (return "")
                           (evaluate . fromMaybe (perror "Error parsing class field.  Must be a string.") . ystr) mcls
             
-            liftM3 Paragraph (parse_inline $ ptext "text") (evaluate clss) (evaluate wrap)
+            lang <- maybe (return "")
+                          (evaluate . fromMaybe (perror "Error parsing language field.  Must be a string.") . ystr) mlang
+
+            liftM4 Paragraph (parse_inline $ ptext "text") (evaluate clss) (evaluate lang) (evaluate wrap)
          _      -> throw $ new_error "Paragraph must be a string or a map"
       where
       -- Look up paragraph text from a map
@@ -188,12 +199,14 @@ instance Yamlable Paragraph where
 yext :: Maybe Yaml -> String -> String
 yext y str = fromMaybe str $ y >>= ystr
 
+-- | Try to read a string from yaml
 ystr :: Yaml -> Maybe String
 ystr y =
    case y of
       YStr s -> Just s
       _      -> Nothing
 
+-- | Try to map with yaml
 ymap :: (Yaml -> a) -> Yaml -> Maybe [a]
 ymap f y =
    case y of
@@ -285,6 +298,32 @@ paras ma =
          YStr t -> fmap (Just . return) $ from_yaml y
          y -> maybe (return Nothing) (fmap Just . sequence) $ ymap from_yaml y
 
+-- Load the manual environment
+instance Yamlable ManEnv where
+   from_yaml y = 
+      case y of
+         YSeq syn_ys -> fmap (ManEnv . M.fromList) $ mapM load_syntax_highlighter syn_ys
+         YMap _ -> fmap (ManEnv . uncurry M.singleton) $ load_syntax_highlighter y
+         _ -> 
+           env_err "Expected map or sequence at the top level."
+      where
+      env_err msg =
+         throw $ error_line "Error while reading manual environment:" $ 
+            error_section $ error_line msg $ empty_error
+      -- Read the values in the IO monad so we're sure the errors are triggered immediately
+      load_syntax_highlighter :: Yaml -> IO (String, SyntaxHighlighter)
+      load_syntax_highlighter y = do
+         slang <- eookup "language" y
+         spkg <- eookup "package" y
+         smod <- eookup "module" y
+         sym <- eookup "symbol" y
+         md <- loadDynamic (spkg, smod, sym)
+         d <- evaluate $ fromMaybe (env_err $ "Could not load syntax highlighter: " ++ intercalate "." [spkg ++ ":", smod, sym]) $ 
+                 md >>= fromDynamic
+         return (slang, (d :: SyntaxHighlighter))
+      eookup nm y = evaluate $
+         fromMaybe (env_err $ "Invalid field: " ++ nm) $ yookup nm y >>= ystr
+
 -- Load a header file
 instance Yamlable Header where
    from_yaml y = let mb = yookup "banners" y in do
@@ -302,8 +341,7 @@ instance Yamlable Header where
       preamble = fmap (fromMaybe []) $ paras $ yookup "preamble" y
       herror nm = throw $ 
          error_line "Error while reading Header:" $
-            error_section $ error_line ("Header did not have valid '" ++ nm ++ "' field.") $ error_section $ 
-               error_lines ["Reading yaml:", show y] empty_error
+            error_section $ error_line ("Header did not have valid '" ++ nm ++ "' field.") $ error_section $               empty_error
 
 -- | Get the qualified names of files in a directory
 getDirectoryFiles :: FilePath -> IO [FilePath]
@@ -316,16 +354,44 @@ load_manual :: FilePath -> IO Manual
 load_manual man_dir = do
    fs <- getDirectoryFiles man_dir
    let files = S.fromList fs
-       sfs = S.delete headf $ S.delete css_file $ files 
-       headf = combine man_dir "header.yaml"
-   catch_read_errs ("Error creating manual from source directory '" ++ man_dir ++ "':") (load_data headf files sfs)
+   catch_read_errs ("Error creating manual from source directory '" ++ man_dir ++ "':") $ do
+      header <- load_header files
+      css <- load_css files
+      syntax <- load_syntax files
+      sections <- load_sections files
+      return $ Manual header css syntax (contents sections) sections
    where
-   load_data headf files sfs = do
-      css <- if S.member css_file files then readFile css_file else return ""
+   -- Load the sections
+   load_sections files = 
+      fmap sort_sections $ mapM load_section $ S.toList sfs 
+      where
+      sfs = S.delete syntaxf $ S.delete headf $ S.delete css_file $ files  
+
+   -- Load the manual header
+   load_header files =
       if S.member headf files
-         then do
-            head <- parse_yaml_file headf >>= from_yaml
-            sections <- fmap sort_sections $ mapM load_section $ S.toList sfs
-            evaluate $ Manual head css (contents sections) sections
-         else throw $ new_error "Header not present"
-   css_file = man_dir `combine` "style" `addExtension` "css"
+         then
+            parse_yaml_file headf >>= from_yaml
+         else 
+            throw $ new_error "Header not present"
+
+   headf = man_dir `combine` "header" `addExtension` "yaml"
+
+   -- Load the syntax file
+   load_syntax files =
+      if S.member syntaxf files
+         then parse_yaml_file syntaxf >>= from_yaml
+         else return $ ManEnv $ M.empty
+   
+   syntaxf = man_dir `combine` "syntax" `addExtension` "yaml"
+
+   -- Load the css
+   load_css files = 
+      if S.member css_file files 
+         then readFile css_file 
+         else return ""
+
+   css_file = 
+      man_dir `combine` "style" `addExtension` "css"
+
+

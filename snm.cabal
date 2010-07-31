@@ -25,7 +25,7 @@ Extra-source-files:
    snm_help.html
 
 Library
-   Build-Depends: base>=4 && < 5, parsec>=3, filepath, directory, containers, HsSyck, spoonutil, safe, xhtml
+   Build-Depends: base>=4 && < 5, parsec>=3, filepath, directory, containers, HsSyck, spoonutil, safe, xhtml, direct-plugins
    Exposed-modules:
       Data.Yaml.Simple
       Manual.Structure
@@ -36,7 +36,7 @@ Library
 
 Executable snm
    Main-is: bin/snm.hs
-   Build-Depends: base>=4, parsec>=3, filepath, directory, containers, HsSyck, spoonutil, safe
+   Build-Depends: base>=4, parsec>=3, filepath, directory, containers, HsSyck, spoonutil, safe, direct-plugins
    Other-modules:
       Data.Yaml.Simple
       Manual.Structure

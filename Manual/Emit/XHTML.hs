@@ -22,6 +22,12 @@ This file is part of The Simple Nice Manual Generator.
 
 -}
 
+{-#
+   OPTIONS
+   -XFlexibleInstances
+   -XFlexibleContexts
+#-}
+
 module Manual.Emit.XHTML
    (render_manual_xhtml)
    where
@@ -33,6 +39,8 @@ import Text.XHtml.Strict hiding (header,title,style)
 import qualified Text.XHtml.Strict as X
 
 import Data.Char
+import qualified Data.Map as M
+import Data.List
 
 -- | Render the manual as XHTML and show as a string
 render_manual_xhtml :: Manual -> String
@@ -45,12 +53,14 @@ instance HTML Manual where
                                    ,content "text/html;charset=utf-8"]
                            , thetitle $ stringToHtml $ pretty $ mtitle $ header man
                            , X.style (primHtml $ style man) ! [thetype "text/css"]]) +++ 
-         (body $ concatHtml $ toHtml (header man) : toHtml (mcontents man) : map toHtml (sections man))
+         (body $ concatHtml $ toHtml (header man, man_env man) : toHtml (mcontents man) : map_env (sections man) (man_env man))
 
 -- The header can be converted to html
-instance HTML Header where
-   toHtml head = concatHtml $
-      (h1 (toHtml $ mtitle head) ! intro_ban_class (mtitle head)) : map (\b -> (h2 $ toHtml b) ! intro_ban_class b) (banners head) ++ map toHtml (preamble head)
+instance HTML (Header,ManEnv) where
+   toHtml (head, man_env) = concatHtml $
+      (h1 (toHtml $ mtitle head) ! intro_ban_class (mtitle head)) : 
+         map (\b -> (h2 $ toHtml b) ! intro_ban_class b) (banners head) ++ 
+            map_env (preamble head) man_env
 
 -- | Get the banner class for banners in the introduction
 intro_ban_class :: Banner -> [HtmlAttr]
@@ -78,19 +88,76 @@ section_title nums section unique =
 section_name :: [Int] -> String -> String 
 section_name nums section = pretty_nums nums " " ++ section
 
--- A section can be converted to html
-instance HTML Section where
-   toHtml sec = concatHtml $
-      section_title (number sec) (title sec) (unique sec) : map toHtml (stext sec) ++ map toHtml (subsections sec)
+-- | Map to html with a manual environment
+map_env :: HTML (x, ManEnv) => [x] -> ManEnv -> [Html]
+map_env ms man_env = 
+   map toHtml $ zip ms (repeat man_env)
 
-instance HTML Paragraph where
-   toHtml para =
-      paragraph (concatHtml $ map (html_inline (wrap para)) (ptext para)) ! [theclass $ pclass para]
+-- A section can be converted to html
+instance HTML (Section, ManEnv) where
+   toHtml (sec, man_env) = concatHtml $
+      section_title (number sec) (title sec) (unique sec) : 
+         map_env (stext sec) man_env ++ map_env (subsections sec) man_env
+
+instance HTML (Paragraph,ManEnv) where
+   toHtml (para, man_env) =
+      paragraph (concatHtml $ paragraph_htmls) ! [theclass $ pclass para]
+      where
+      paragraph_htmls = 
+         map (find_syntax_highlight man_env (language para) (wrap para)) (ptext para)
+
+
+-- | Find the syntax and highlight
+find_syntax_highlight :: ManEnv -- ^ The environment
+                      -> String -- ^ The language
+                      -> Bool   -- ^ Wrap the text
+                      -> Inline -- ^ Inline element to render
+                      -> Html   -- ^ Render html
+find_syntax_highlight man_env language wrap inline = flip ($) inline $
+   if null language
+      then without_lang
+      else
+         maybe without_lang with_lang $ 
+            M.lookup language (syntax man_env)
+   where
+   with_lang trans il =
+      highlight wrap il trans man_env
+   without_lang il = 
+      html_inline wrap il man_env
+
+-- | Highlight xhtml
+highlight :: Bool -- ^ Wrap the text
+          -> Inline -- ^ The inline element
+          -> SyntaxHighlighter -- ^ The syntax highlighter
+          -> ManEnv -- ^ The manual environment 
+          -> Html -- ^ Produce Html
+highlight wrap inline syn man_env =
+      case inline of
+         IText str -> highlight_syntax str
+         ISectionLink text dest -> section_link (concatHtml $ map recurse text) dest
+         IExternLink text dest  -> extern_link (concatHtml $ map recurse text) dest
+         ILiteral t -> primHtml t
+         IClass t c -> thespan (concatHtml $ map recurse t) ! [theclass c]
+         ILanguage t lang -> concatHtml $ map (find_syntax_highlight man_env lang wrap) t
+   where
+   highlight_syntax str =
+      concatHtml $ map (uncurry create_syntax_element) $ unfoldr syntax_class str
+   syntax_class text =
+      if null text
+         then Nothing
+         else Just ((consumed, cls), rest)
+      where
+      (cls, consumed, rest) = syn text
+   create_syntax_element text cls = 
+      (thespan $ (if wrap then primHtml else literal_spaces) $ stringToHtmlString text) ! [theclass cls]
+   recurse il = highlight wrap il syn man_env
+
+          
 
 -- Convert banners into html
 instance HTML Banner where
    toHtml ban =
-      concatHtml $ map (html_inline True) (btext ban)
+      concatHtml $ map (\il -> html_inline True il new_man_env) (btext ban)
 
 -- | Banners for the sections
 section_ban_class :: Banner -> [HtmlAttr]
@@ -105,19 +172,21 @@ ban_class def ban = [theclass cls]
          then def
          else bclass ban      
 
--- Html instance for inline elements
-instance HTML Inline where
-   toHtml = html_inline True
-
 -- | Make an inline element into html   
-html_inline :: Bool -> Inline -> Html
-html_inline wrap inline = 
+html_inline :: Bool -- ^ Wrap the text
+            -> Inline -- ^ The inline element
+            -> ManEnv -- ^ The manual's environment
+            -> Html -- ^ Produced html
+html_inline wrap inline man_env = 
       case inline of
          IText str -> (if wrap then stringToHtml else literal_spaces . stringToHtmlString) str
-         ISectionLink text dest -> section_link (concatHtml $ map toHtml text) dest
-         IExternLink text dest  -> extern_link (concatHtml $ map toHtml text) dest
+         ISectionLink text dest -> section_link (concatHtml $ map recurse text) dest
+         IExternLink text dest  -> extern_link (concatHtml $ map recurse text) dest
          ILiteral t -> primHtml t
-         IClass t c -> thespan (concatHtml $ map toHtml t) ! [theclass c]
+         IClass t c -> thespan (concatHtml $ map recurse t) ! [theclass c]
+         ILanguage t lang -> concatHtml $ map (find_syntax_highlight man_env lang wrap) t
+   where
+   recurse il = html_inline wrap il man_env
 
 -- | Convert all spaces and newlines into literal html spaces and newlines.
 literal_spaces :: String -> Html
