@@ -33,6 +33,7 @@ Library
       Manual.Emit
       Manual.Emit.XHTML
       Manual.Easy
+      Text.Syntax.Test
 
 Executable snm
    Main-is: bin/snm.hs

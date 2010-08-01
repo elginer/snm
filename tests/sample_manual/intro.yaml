@@ -1,4 +1,8 @@
 unique: intro
 number: 1
 title: Introduction
-text: "I have written this long article about how I am the best.  This is covered in detail in the {section best really} section you will ever see!"
+text: 
+   - "I have written this long article about how I am the best.  This is covered in detail in the {section best really} section you will ever see!"
+   - language: colour
+     text: "red and yellow and green and blue"
+

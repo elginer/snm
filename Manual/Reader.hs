@@ -318,7 +318,7 @@ instance Yamlable ManEnv where
          smod <- eookup "module" y
          sym <- eookup "symbol" y
          md <- loadDynamic (spkg, smod, sym)
-         d <- evaluate $ fromMaybe (env_err $ "Could not load syntax highlighter: " ++ intercalate "." [spkg ++ ":", smod, sym]) $ 
+         d <- evaluate $ fromMaybe (env_err $ "Could not load syntax highlighter: " ++ spkg ++ ":" ++ smod ++ "." ++ sym) $ 
                  md >>= fromDynamic
          return (slang, (d :: SyntaxHighlighter))
       eookup nm y = evaluate $

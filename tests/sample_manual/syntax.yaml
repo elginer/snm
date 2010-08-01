@@ -1,0 +1,4 @@
+language: colour 
+package: snm-0.0.5
+module: Text.Syntax.Test
+symbol: colour
