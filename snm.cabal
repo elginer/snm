@@ -1,4 +1,4 @@
-Name:           snm 
+Name:           snm
 Version:	0.0.5
 License:	GPL-3
 License-File:   COPYING	
@@ -21,7 +21,7 @@ Build-type:	Simple
 Homepage:	http://github.com/elginer/snm
 Cabal-version:	>=1.4
 
-Extra-source-files: 
+Extra-source-files:
    snm_help.html
 
 Library
@@ -34,6 +34,7 @@ Library
       Manual.Emit.XHTML
       Manual.Easy
       Text.Syntax.Test
+      Text.Syntax.Simple
 
 Executable snm
    Main-is: bin/snm.hs

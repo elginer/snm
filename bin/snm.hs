@@ -84,6 +84,8 @@ usage = do
    nm <- getProgName
    putStrLn $ usageInfo 
       (unlines [nm ++ ": The Simple Nice-Looking Manual Generator"
+              ,"The Simple Nice-Looking Manual Generator is Free software."
+              ,"Download the source at http://github.com/elginer/snm"
               ,"\nusage: "
               ,"   " ++ nm ++ " documentation_source_directory options*"
               ,"\nWhere options* stands for zero or more of the options below."

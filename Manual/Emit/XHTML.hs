@@ -148,9 +148,17 @@ highlight wrap inline syn man_env =
          else Just ((consumed, cls), rest)
       where
       (cls, consumed, rest) = syn text
-   create_syntax_element text cls = 
-      (thespan $ (if wrap then primHtml else literal_spaces) $ stringToHtmlString text) ! [theclass cls]
-   recurse il = highlight wrap il syn man_env
+   create_syntax_element text cls =
+      if null cls
+         then trans_text
+         else (thespan $ trans_text) ! [theclass cls]
+      where
+      trans_text = 
+         (if wrap 
+            then primHtml
+            else literal_spaces) $ stringToHtmlString text
+   recurse il = 
+      highlight wrap il syn man_env
 
           
 

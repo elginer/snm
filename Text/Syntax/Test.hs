@@ -21,6 +21,8 @@ This file is part of The Simple Nice Manual Generator.
 -- | A little module, exposed to test the syntax highlighting plugin system.
 module Text.Syntax.Test where
 
+import Text.Syntax.Simple
+
 import Manual.Structure
 
 import Data.Dynamic
@@ -37,46 +39,5 @@ import Control.Monad
 
 -- | The plugin, highlights red, yellow, green, blue
 colour :: Dynamic
-colour = toDyn highlight_colour
-
--- | Highlight a colour string
-highlight_colour :: SyntaxHighlighter
-highlight_colour str =
-   either perror id $ parse colour_or_plain "" str
-   where
-   perror e =
-      throw $ error_lines ["Programmer error in colour plugin"
-                          ,"in snm:Text.Syntax.Test"] $ report e
-
--- | Plain text or colour
-colour_or_plain :: Parser (String, String, String)
-colour_or_plain = plain_acc ""
-   where
-   plain_acc acc =
-      try col_ahead <|> plain
-      where
-      col_ahead = do
-         lookAhead polour
-         if null acc
-            then polour
-            else do
-               i <- getInput
-               return ("", reverse acc, i)
-      plain = do
-         c <- anyChar
-         plain_acc $ c : acc
-
--- | Colour parser
-polour :: Parser (String, String, String)
-polour = msum $ map try
-   [col "red"
-   ,col "yellow"
-   ,col "green"
-   ,col "blue"]
-
-col :: String -> Parser (String, String, String)
-col c = do
-   string c
-   i <- getInput
-   return (c ++ "_elem", c, i)
+colour = highlight "colour" $ map (\c -> (c, c ++ "_elem", c)) ["red", "yellow", "green", "blue"]
 
