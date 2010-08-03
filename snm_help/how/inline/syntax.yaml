@@ -1,0 +1,18 @@
+# Copyright John Morrice 2010
+# This document is part of The Simple Nice-Looking Manual Generator documentation
+# This document is released under the terms of the GNU Free Documentation Licence
+# See the file DOC-COPYING.
+title: Inline Syntax Highlighting
+number: 4
+unique: inlinesyntax
+text:
+   - "snm supports inline {section syntax highlighting syntax} through {class language example} inline elements.  An example:"
+   - class: example
+     wrap: False
+     text: "   Some logic:\{language forall E. A subset B. E member A implies E member B math}"
+   - "This is rendered as:"
+   - class: example
+     wrap: False
+     text: "   Some logic:{language forall E. A subset B. E member A implies E member B math}"
+
+   

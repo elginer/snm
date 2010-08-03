@@ -1,0 +1,9 @@
+# Copyright John Morrice 2010
+# This document is part of The Obelisk Programming Language documentation
+# This document is released under the terms of the GNU Free Documentation Licence
+# See the file DOC-COPYING.
+
+language: math
+package: snmmath-0.0.1
+module: Text.Syntax.Math
+symbol: math

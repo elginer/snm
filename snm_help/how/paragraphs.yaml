@@ -50,11 +50,11 @@ text:
    - wrap: False
      class: example
      text: "   language: math
-          \n   text: \"forall A forsome B [A memberof C B memberof C . A + B ]\""
+          \n   text: \"forall A. A !member empty\""
    - "Is rendered as:"
    - language: math
      wrap: False
-     text: "   forall A forsome B [A memberof C B memberof C . A + B ]"
+     text: "   forall A. A !member empty"
 
 
 

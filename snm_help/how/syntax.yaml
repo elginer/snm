@@ -20,3 +20,11 @@ text:
    - "snm provides a module {class Text.Syntax.Simple example} which makes it easy to write keyword-oriented syntax highlighters."
    - "Be aware that snm will not html escape strings returned by the syntax highlighter.  {class Text.XHtml.Strict.stringToHtmlString example} from the {external xhtml package http://hackage.haskell.org/package/xhtml} may be useful."
    - "As an example, here is this document's syntax.yaml:"
+   - class: example
+     wrap: False
+     text:
+        "   language: math
+       \n   package: snmmath-0.0.1
+       \n   module: Text.Syntax.Math
+       \n   symbol: math"
+   - "{external snmmath is hosted on github, too http://github.com/elginer/snm_math}."
