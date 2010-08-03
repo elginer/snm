@@ -30,6 +30,8 @@ import Text.Parsec
 import Text.Parsec.String
 import Text.Parsec.Prim
 
+import Text.XHtml.Strict
+
 import Error.Report
 
 import Control.Exception hiding (try)
@@ -49,7 +51,10 @@ associate_keywords name key_assoc str =
    either perror id $ parse (keyword_or_plain key_assoc) "" str
    where
    perror e =
-      throw $ error_lines ["Programmer error in plugin '" ++ name ++ "'"] $ report e
+      throw $ error_lines ["Programmer error in plugin '" ++ name ++ "'"
+                          ,"<Begin input>"
+                          ,str
+                          ,"<End input>"] $ report e
 
 -- | Plain text or highlight
 keyword_or_plain :: [(String, String, String)] -- ^ The first is the keyword, second the class, third the returned string (allowing the keyword to be transformed)
@@ -65,10 +70,11 @@ keyword_or_plain key_assoc = plain_acc ""
             then grab_keys key_assoc
             else do
                i <- getInput
-               return ("", reverse acc, i)
-      plain = do
-         c <- anyChar
-         plain_acc $ c : acc
+               return ("", accum, i)
+      plain =
+         (do c <- anyChar
+             plain_acc $ c : acc) <|> (eof >> return ("", accum, ""))
+      accum = stringToHtmlString $ reverse acc
 
 -- | Parse one of many keyworsd
 grab_keys :: [(String, String, String)] -- ^ The first is the keyword, second the class, third the returned string (allowing the keyword to be transformed)

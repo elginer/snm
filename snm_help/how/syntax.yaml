@@ -1,0 +1,22 @@
+# Copyright John Morrice 2010
+# This document is part of The Simple Nice-Looking Manual Generator documentation
+# This document is released under the terms of the GNU Free Documentation Licence
+# See the file DOC-COPYING.
+
+title: Syntax Highlighting
+number: 7
+unique: syntax
+text:
+   - "snm supports extensible syntax highlighting through dynamically loaded plugins."
+   - "Once a highlighting plugin is set up for a language, the language may be used in a {section paragraph paragraphs} or in an {section inline language element language}"
+   - "Syntax highlighting is configured through the top-level syntax.yaml file."
+   - "This file contains either a syntax map, or a sequence of such maps."
+   - "The syntax map has four elements:"
+   - "language: The name of the language.  It gives a name to the syntax highlighter in the document."
+   - "package: The name of the Haskell package providing the plugin.  Version number included."
+   - "module: The name of the module providing the plugin."
+   - "symbol: The name of the plugin."
+   - "Syntax plugins must have type {class Dynamic example}.  However, this type must have been constructed from a {class SyntaxHighlighter example}, defined in snm's {class Manual.Structure example}."
+   - "snm provides a module {class Text.Syntax.Simple example} which makes it easy to write keyword-oriented syntax highlighters."
+   - "Be aware that snm will not html escape strings returned by the syntax highlighter.  {class Text.XHtml.Strict.stringToHtmlString example} from the {external xhtml package http://hackage.haskell.org/package/xhtml} may be useful."
+   - "As an example, here is this document's syntax.yaml:"

@@ -45,6 +45,16 @@ text:
    - class: example
      wrap:  False
      text: "   Hey ho, let's go!"
+   - "Paragraphs can also be associated with a formal language.  This will trigger {section syntax highlighting syntax}."
+   - "An example:"
+   - wrap: False
+     class: example
+     text: "   language: math
+          \n   text: \"forall A forsome B [A memberof C B memberof C . A + B ]\""
+   - "Is rendered as:"
+   - language: math
+     wrap: False
+     text: "   forall A forsome B [A memberof C B memberof C . A + B ]"
 
 
 

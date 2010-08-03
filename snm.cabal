@@ -1,47 +1,87 @@
-Name:           snm
-Version:	0.0.5
-License:	GPL-3
-License-File:   COPYING	
-Author:		John Morrice <spoon@killersmurf.com>
-Maintainer:	John Morrice <spoon@killersmurf.com>
-Category:	Documentation
-Synopsis:       The Simple Nice-Looking Manual Generator.
-Description:
-		snm allows you to write clean, web-friendly reports, user guides and manuals without having to edit fickle html.
-		.
-		snm allows you to structure your document in a modular fashion.
-		.
-		snm document sections are written in yaml and are easy to write and understand.
-		.
-		snm is a generator of small, valid xhtml files.
-		.
-		Read the snm manual online: http:\/\/www.killersmurf.com\/static\/snm_help.html
-
-Build-type:	Simple
-Homepage:	http://github.com/elginer/snm
-Cabal-version:	>=1.4
-
-Extra-source-files:
-   snm_help.html
-
-Library
-   Build-Depends: base>=4 && < 5, parsec>=3, filepath, directory, containers, HsSyck, spoonutil, safe, xhtml, direct-plugins
-   Exposed-modules:
-      Data.Yaml.Simple
-      Manual.Structure
-      Manual.Reader
-      Manual.Emit
-      Manual.Emit.XHTML
-      Manual.Easy
-      Text.Syntax.Test
-      Text.Syntax.Simple
-
-Executable snm
-   Main-is: bin/snm.hs
-   Build-Depends: base>=4, parsec>=3, filepath, directory, containers, HsSyck, spoonutil, safe, direct-plugins
-   Other-modules:
-      Data.Yaml.Simple
-      Manual.Structure
-      Manual.Reader
-      Manual.Emit.XHTML
-      Manual.Easy
+name: snm
+version: 0.0.5
+cabal-version: >=1.4
+build-type: Simple
+license: GPL-3
+license-file: COPYING
+copyright:
+maintainer: John Morrice <spoon@killersmurf.com>
+build-depends: HsSyck -any, HsSyck -any, base >=4 && <5,
+               base >=4 && <5, base >=4 && <5, base >=4 && <5, containers -any,
+               containers -any, direct-plugins -any, direct-plugins -any,
+               directory -any, directory -any, filepath -any, filepath -any,
+               parsec >=3, parsec >=3, safe -any, safe -any, spoonutil -any,
+               spoonutil -any, xhtml -any, xhtml -any
+stability:
+homepage: http://github.com/elginer/snm
+package-url:
+bug-reports:
+synopsis: The Simple Nice-Looking Manual Generator.
+description: snm allows you to write clean, web-friendly reports, user guides and manuals without having to edit fickle html.
+             .
+             snm allows you to structure your document in a modular fashion.
+             .
+             snm document sections are written in yaml and are easy to write and understand.
+             .
+             snm is a generator of small, valid xhtml files.
+             .
+             Read the snm manual online: http:\/\/www.killersmurf.com\/static\/snm_help.html
+category: Documentation
+author: John Morrice <spoon@killersmurf.com>
+tested-with:
+data-files:
+data-dir: ""
+extra-source-files: snm_help.html
+extra-tmp-files:
+exposed-modules: Data.Yaml.Simple Text.Syntax.Simple
+                 Text.Syntax.Test Manual.Reader Manual.Easy Manual.Emit
+                 Manual.Structure Manual.Emit.XHTML
+exposed: True
+buildable: True
+build-tools:
+cpp-options:
+cc-options:
+ld-options:
+pkgconfig-depends:
+frameworks:
+c-sources:
+extensions:
+extra-libraries:
+extra-lib-dirs:
+includes:
+install-includes:
+include-dirs:
+hs-source-dirs: .
+other-modules:
+ghc-prof-options:
+ghc-shared-options:
+ghc-options:
+hugs-options:
+nhc98-options:
+jhc-options:
+ 
+executable: snm
+main-is: bin/snm.hs
+buildable: True
+build-tools:
+cpp-options:
+cc-options:
+ld-options:
+pkgconfig-depends:
+frameworks:
+c-sources:
+extensions:
+extra-libraries:
+extra-lib-dirs:
+includes:
+install-includes:
+include-dirs:
+hs-source-dirs: .
+other-modules: Data.Yaml.Simple Manual.Reader Manual.Easy
+               Manual.Structure Manual.Emit.XHTML
+ghc-prof-options:
+ghc-shared-options:
+ghc-options:
+hugs-options:
+nhc98-options:
+jhc-options:

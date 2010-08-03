@@ -53,7 +53,9 @@ instance HTML Manual where
                                    ,content "text/html;charset=utf-8"]
                            , thetitle $ stringToHtml $ pretty $ mtitle $ header man
                            , X.style (primHtml $ style man) ! [thetype "text/css"]]) +++ 
-         (body $ concatHtml $ toHtml (header man, man_env man) : toHtml (mcontents man) : map_env (sections man) (man_env man))
+         (body $ concatHtml $ toHtml (header man, man_env man) : 
+            (h2 (stringToHtml "Contents:") ! [theclass "contents_announce"]) : toHtml (mcontents man) : 
+               map_env (sections man) (man_env man))
 
 -- The header can be converted to html
 instance HTML (Header,ManEnv) where
@@ -156,7 +158,7 @@ highlight wrap inline syn man_env =
       trans_text = 
          (if wrap 
             then primHtml
-            else literal_spaces) $ stringToHtmlString text
+            else literal_spaces) text
    recurse il = 
       highlight wrap il syn man_env
 

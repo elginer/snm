@@ -40,6 +40,7 @@ import Data.Either
 import Data.Maybe
 import Data.List
 import qualified Data.Set as S
+import Data.Char
 
 import qualified Data.Map as M
 
@@ -65,7 +66,8 @@ bracketed :: Parser Inline
 bracketed = try section_link <|> try extern_link <|> try iliteral <|> try cls <|> ilang
 
 ilang :: Parser Inline
-ilang = inlines_element_attribute "language" ILanguage
+ilang =
+   inlines_element_attribute "language" ILanguage
 
 cls :: Parser Inline
 cls = inlines_element_attribute "class" IClass
@@ -104,6 +106,8 @@ nested = try bracketed <|> try (do
    s <- many1 $ noneOf " {\n\r\t}"
    return $ IText $ ' ' : s)
 
+chomp :: String -> String
+chomp = reverse . dropWhile isSpace . reverse . dropWhile isSpace
 
 inlines_element_attribute :: String -> ([Inline] -> String -> Inline) -> Parser Inline 
 inlines_element_attribute name f = inline_element name $ do
@@ -116,7 +120,7 @@ inlines_element_attribute name f = inline_element name $ do
        txt = fst_elem : init rest
       -- This is sooo much of a hack because there isn't a decent grammar.
    uniq <- case uniqi of
-              IText t -> return t
+              IText t -> return $ chomp t
               _       -> unexpected "nested inline element: the last element should be a string."
    return $ f txt uniq
 
@@ -180,7 +184,7 @@ instance Yamlable Paragraph where
                           (evaluate . fromMaybe (perror "Error parsing class field.  Must be a string.") . ystr) mcls
             
             lang <- maybe (return "")
-                          (evaluate . fromMaybe (perror "Error parsing language field.  Must be a string.") . ystr) mlang
+                          (evaluate . maybe (perror "Error parsing language field.  Must be a string.") chomp . ystr) mlang
 
             liftM4 Paragraph (parse_inline $ ptext "text") (evaluate clss) (evaluate lang) (evaluate wrap)
          _      -> throw $ new_error "Paragraph must be a string or a map"
@@ -313,7 +317,7 @@ instance Yamlable ManEnv where
       -- Read the values in the IO monad so we're sure the errors are triggered immediately
       load_syntax_highlighter :: Yaml -> IO (String, SyntaxHighlighter)
       load_syntax_highlighter y = do
-         slang <- eookup "language" y
+         slang <- fmap chomp $ eookup "language" y
          spkg <- eookup "package" y
          smod <- eookup "module" y
          sym <- eookup "symbol" y

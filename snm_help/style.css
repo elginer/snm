@@ -5,6 +5,13 @@
   See the file DOC-COPYING.
 */
 .intro_banner {text-align: center;}
-.example {font-family: monospace; font-size: x-large;}
+.example 
+{
+   font-family: monospace; 
+   font-size: x-large;
+   border-style: solid; 
+   border-width: 0.02em;
+   padding: 0.4em; 
+}
 body {font: arial; font-family: sans;}
 .boring {font-weight: bold}
